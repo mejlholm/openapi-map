@@ -27,7 +27,7 @@ spec:
       serviceAccountName: openapi-map
       containers:
       - name: openapi-map
-        image: mejlholm/openapi-map:latest
+        image: mejlholm/openapi-map:0.0.4
         resources:
           limits:
             memory: "256Mi"
@@ -38,7 +38,7 @@ spec:
           value: 'const'
         - name: JAEGER_SAMPLER_PARAM
           value: '1'
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
           httpGet:

@@ -12,7 +12,7 @@ metadata:
   name: openapi-map
   namespace: apps
 rules:
-  - apiGroups: [""]
+  - apiGroups: ["", "extensions"]
     resources: ["pods", "services", "ingresses"]
     verbs: ["list"]
 
