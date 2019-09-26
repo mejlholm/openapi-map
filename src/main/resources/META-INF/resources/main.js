@@ -2,18 +2,31 @@ function getServices() {
     console.log("getting services...");
     $.getJSON({url: window.location.origin + "/service",
         success: function(services) {
+
             var rows = "";
             $.each(services, function(idx, service) {
+
+                var previousName = "";
                 $.each(service['pathResults'], function(pathIdx, pathResult) {
-                    var newRow = '<tr><td>' + service['name'] + '</td><td><a href="' + service['openapiUrl'] + '">Link</a></td>';
-                    newRow += '<td>' + pathResult['path'] + '</td><td>';
+
+                    if (service['name'] === previousName) {
+                        var newRow = '<tr><td colspan="2"/>';
+                    } else {
+                        var newRow = '<tr><td class="text-left lead">' + service['name'] + '</td><td class="text-left"><a href="' + service['openapiUrl'] + '">Link</a></td>';
+                    }
+                    newRow += '<td class="text-left lead">' + pathResult['path'] + '</td><td class="text-left">';
+
                     $.each(pathResult['operations'], function(operationIdx, operation) {
                         newRow += getButton(operation);
                     })
+
                     rows += '</td></tr>' + newRow;
+                    previousName = service['name'];
                 })
             });
+
             $("#services").html(rows);
+
         },
         error:  function(result) {
             $("#services").html("<tr><td colspan=\"4\">Oh no - error getting services!</td></tr>");

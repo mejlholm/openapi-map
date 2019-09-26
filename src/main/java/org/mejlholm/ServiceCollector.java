@@ -61,6 +61,9 @@ public class ServiceCollector {
             results.add(new ServiceResult(i.getMetadata().getName(), url, pathResults));
         }
         services = results;
+
+
+        // TODO: 9/26/19 make overview of non-ingressed services 
     }
 
     private List<PathResult> parseOpenapi(String baseUrl) throws IOException {
