@@ -1,0 +1,22 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: build-openapi-map
+    image: plugins/docker
+    settings:
+      repo: mejlholm/openapi-map
+      username:
+        from_secret: docker_hub_username
+      password:
+        from_secret: docker_hub_password
+      tags:
+        - latest
+        - 0.0.${DRONE_BUILD_NUMBER}
+
+trigger:
+  branch:
+    - master
+  event:
+    exclude:
+    - tag

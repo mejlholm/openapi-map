@@ -1,0 +1,60 @@
+---
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  name: openapi-map
+  namespace: apps
+  labels:
+    app: openapi-map
+  annotations:
+    fluxcd.io/tag.openapi-map: glob:2.*
+    fluxcd.io/automated: 'true'
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: openapi-map
+  template:
+    metadata:
+      name: openapi-map
+      labels:
+        app: openapi-map
+      annotations:
+        #linkerd.io/inject: enabled
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
+    spec:
+      containers:
+      - name: openapi-map
+        image: mejlholm/openapi-map:2.0.123
+        resources:
+          limits:
+            memory: "96Mi"
+        env:
+        - name: JAEGER_ENDPOINT
+          value: 'http://jaeger-collector.monitoring:14268/api/traces'
+        - name: JAEGER_SAMPLER_TYPE
+          value: 'const'
+        - name: JAEGER_SAMPLER_PARAM
+          value: '1'
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health/live
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health/ready
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 5

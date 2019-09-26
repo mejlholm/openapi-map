@@ -1,0 +1,15 @@
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: openapi-map
+  namespace: apps
+spec:
+  rules:
+  - host: openapi-map.mejlholm.org
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: openapi-map
+          servicePort: 8080

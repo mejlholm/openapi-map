@@ -1,0 +1,14 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: openapi-map
+  namespace: apps
+spec:
+  selector:
+    app: openapi-map
+  ports:
+    - name: default
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
