@@ -22,8 +22,10 @@ function getServices() {
     reload();
 }
 
+//map operations to colors
 function getButton(operation) {
-    var className = "btn-secondary";
+    var className = "btn-secondary"; //default color for the more exotic operations
+
     if (operation === 'GET'){
         className = "btn-primary";
     } else if (operation === 'DELETE') {
