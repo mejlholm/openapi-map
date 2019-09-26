@@ -7,10 +7,10 @@ metadata:
   labels:
     app: openapi-map
   annotations:
-    fluxcd.io/tag.openapi-map: glob:2.*
-    fluxcd.io/automated: 'true'
+    #fluxcd.io/tag.openapi-map: glob:2.*
+    #fluxcd.io/automated: 'true'
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: openapi-map
@@ -24,12 +24,13 @@ spec:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8080'
     spec:
+      serviceAccountName: openapi-map
       containers:
       - name: openapi-map
-        image: mejlholm/openapi-map:2.0.123
+        image: mejlholm/openapi-map:latest
         resources:
           limits:
-            memory: "96Mi"
+            memory: "256Mi"
         env:
         - name: JAEGER_ENDPOINT
           value: 'http://jaeger-collector.monitoring:14268/api/traces'
@@ -37,7 +38,7 @@ spec:
           value: 'const'
         - name: JAEGER_SAMPLER_PARAM
           value: '1'
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
           httpGet:
