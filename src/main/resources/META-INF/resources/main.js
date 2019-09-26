@@ -16,7 +16,7 @@ function getServices() {
             $("#services").html(rows);
         },
         error:  function(result) {
-            $("#services").html("<tr><td colspan=\"2\">Oh no - error getting services!</td></tr>");
+            $("#services").html("<tr><td colspan=\"4\">Oh no - error getting services!</td></tr>");
         }
     });
     reload();
