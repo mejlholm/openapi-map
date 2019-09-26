@@ -1,14 +1,14 @@
 function getServices() {
     console.log("getting services...");
     $.getJSON({url: window.location.origin + "/service",
-        success: function(result) {
+        success: function(services) {
             var rows = "";
-            $.each(result, function(idx) {
-                $.each(result[idx]['pathResults'], function(pathIdx) {
-                    var newRow = '<tr><td>' + result[idx]['name'] + '</td><td><a href="' + result[idx]['openapiUrl'] + '">Link</a></td>';
-                    newRow += '<td>' + result[idx]['pathResults'][pathIdx]['path'] + '</td><td>';
-                    $.each(result[idx]['pathResults'][pathIdx]['operations'], function(operationIdx) {
-                        newRow += getButton(result[idx]['pathResults'][pathIdx]['operations'][operationIdx]);
+            $.each(services, function(idx, service) {
+                $.each(service['pathResults'], function(pathIdx, pathResult) {
+                    var newRow = '<tr><td>' + service['name'] + '</td><td><a href="' + service['openapiUrl'] + '">Link</a></td>';
+                    newRow += '<td>' + pathResult['path'] + '</td><td>';
+                    $.each(pathResult['operations'], function(operationIdx, operation) {
+                        newRow += getButton(operation);
                     })
                     rows += '</td></tr>' + newRow;
                 })
