@@ -3,7 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: openapi-map
-  namespace: openapi-map
+  namespace: apps
 spec:
   selector:
     app: openapi-map

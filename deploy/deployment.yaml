@@ -3,7 +3,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: openapi-map
-  namespace: openapi-map
+  namespace: apps
   labels:
     app: openapi-map
   annotations:
@@ -24,7 +24,7 @@ spec:
       serviceAccountName: openapi-map
       containers:
       - name: openapi-map
-        image: mejlholm/openapi-map:0.0.11
+        image: mejlholm/openapi-map:0.0.13
         resources:
           limits:
             memory: "256Mi"
