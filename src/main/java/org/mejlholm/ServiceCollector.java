@@ -7,6 +7,7 @@ import io.quarkus.scheduler.Scheduled;
 import io.smallrye.openapi.runtime.io.OpenApiParser;
 import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.eclipse.microprofile.openapi.models.Paths;
@@ -39,10 +40,13 @@ public class ServiceCollector {
         return services;
     }
 
+    @ConfigProperty(name = "NAMESPACE")
+    private String namespace;
+
+
     @Scheduled(every = "10m")
     void collectServices() {
 
-        final String namespace = "apps";
         List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
         List<ServiceResult> results = new ArrayList<>();
@@ -73,39 +77,41 @@ public class ServiceCollector {
 
         List<PathResult> results = new ArrayList<>();
         for (Map.Entry<String, PathItem> entry : paths.getPathItems().entrySet()) {
-            String pathName = entry.getKey();
-
-            PathItem pathItem = entry.getValue();
-            List<String> operations = new ArrayList<>();
-
-            if (pathItem.getDELETE() != null) {
-                operations.add("DELETE");
-            }
-            if (pathItem.getGET() != null) {
-                operations.add("GET");
-            }
-            if (pathItem.getHEAD() != null) {
-                operations.add("HEAD");
-            }
-            if (pathItem.getOPTIONS() != null) {
-                operations.add("OPTIONS");
-            }
-            if (pathItem.getPATCH() != null) {
-                operations.add("PATCH");
-            }
-            if (pathItem.getPOST() != null) {
-                operations.add("POST");
-            }
-            if (pathItem.getPUT() != null) {
-                operations.add("PUT");
-            }
-            if (pathItem.getTRACE() != null) {
-                operations.add("TRACE");
-            }
-
-            results.add(new PathResult(pathName, operations));
+            results.add(new PathResult(entry.getKey(), getPathOperations(entry.getValue())));
         }
         return results;
+    }
+
+
+    private List<String> getPathOperations(PathItem pathItem) {
+        List<String> operations = new ArrayList<>();
+
+        if (pathItem.getDELETE() != null) {
+            operations.add("DELETE");
+        }
+        if (pathItem.getGET() != null) {
+            operations.add("GET");
+        }
+        if (pathItem.getHEAD() != null) {
+            operations.add("HEAD");
+        }
+        if (pathItem.getOPTIONS() != null) {
+            operations.add("OPTIONS");
+        }
+        if (pathItem.getPATCH() != null) {
+            operations.add("PATCH");
+        }
+        if (pathItem.getPOST() != null) {
+            operations.add("POST");
+        }
+        if (pathItem.getPUT() != null) {
+            operations.add("PUT");
+        }
+        if (pathItem.getTRACE() != null) {
+            operations.add("TRACE");
+        }
+
+        return operations;
     }
 
 }
