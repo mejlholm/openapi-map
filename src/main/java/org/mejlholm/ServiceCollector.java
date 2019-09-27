@@ -16,6 +16,9 @@ import org.mejlholm.model.PathResult;
 import org.mejlholm.model.ServiceResult;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -47,12 +50,14 @@ public class ServiceCollector {
     @Scheduled(every = "10m")
     void collectServices() {
 
+        Client client = ClientBuilder.newClient(); // TODO: 9/27/19 cache better
+
         List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
         List<ServiceResult> results = new ArrayList<>();
         for (Ingress i: ingresses) {
 
-            //fixme, the edge case needs some more thought
+            //todo, the edge case needs around rules need some more thought, can we only run into http?
             List<PathResult> pathResults = null;
             IngressRule rule = i.getSpec().getRules().get(0);
             final String openapiUrl = "http://" + rule.getHost() + "/openapi";
@@ -62,15 +67,33 @@ public class ServiceCollector {
                 log.info("Unable to open url: " + openapiUrl);
             }
 
-            // TODO: 9/27/19 try to get openapiUiUrl and only show if it exists. Also try /openapi/ui
-            final String openapiUiUrl = "http://" + rule.getHost() + "/swagger-ui";
 
-            results.add(new ServiceResult(i.getMetadata().getName(), openapiUrl, openapiUiUrl, pathResults));
+            results.add(new ServiceResult(i.getMetadata().getName(), openapiUrl, getOpenapiUiUrl(client, rule), pathResults));
         }
+
         services = results;
 
-
         // TODO: 9/26/19 make overview of non-ingressed services 
+
+        // TODO: 9/27/19 filter using labels from kubernetes
+
+        client.close();
+    }
+
+    private String getOpenapiUiUrl(Client client, IngressRule rule) {
+
+
+        String[] possibleUiPaths = {"/openapi/ui", "/swagger-ui"}; //other???
+        for (String path: possibleUiPaths) {
+            String fullPath = "http://" + rule.getHost() + "/" + path;
+            Response response = client.target(fullPath).request().get();
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                return fullPath;
+            }
+        }
+
+
+        return null;
     }
 
     private List<PathResult> parseOpenapi(String baseUrl) throws IOException {
