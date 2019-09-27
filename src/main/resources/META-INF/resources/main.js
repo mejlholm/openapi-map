@@ -52,11 +52,11 @@ function renderRows(services) {
 
                 newRow += '<td>'
                 if (service['openapiUrl'] != null) {
-                   newRow += '<a href="' + service['openapiUrl'] + '">Openapi</a>';
+                   newRow += '<a href="' + service['openapiUrl'] + '">OpenAPI</a>';
                 }
 
                 if (service['openapiUiUrl'] != null) {
-                    newRow += ' / <a href="' + service['openapiUiUrl'] + '">UI</a>';
+                    newRow += ' | <a href="' + service['openapiUiUrl'] + '">UI</a>';
                 }
 
                 newRow += '</td>';
