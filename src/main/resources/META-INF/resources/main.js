@@ -1,47 +1,86 @@
-function getServices() {
-    console.log("getting services...");
-    $.getJSON({url: window.location.origin + "/services",
-        success: function(services) {
-
-            var rows = "";
-            $.each(services, function(idx, service) {
-
-                var previousName = "";
-                $.each(service['pathResults'], function(pathIdx, pathResult) {
-
-                    var newRow = "";
-                    if (service['name'] === previousName) {
-                        newRow += '<tr><td colspan="2"/>';
-                    } else {
-                        newRow += '<tr><td class="text-left lead">' + service['name'] + '</td>';
-                        newRow += '<td class="text-left"><a href="' + service['openapiUrl'] + '">Openapi</a>';
-
-                        if (service['openapiUiUrl'] != null) {
-                            newRow += ' / <a href="' + service['openapiUiUrl'] + '">UI</a>';
-                        }
-
-                        newRow += '</td>';
-                    }
-                    newRow += '<td class="text-left lead">' + pathResult['path'] + '</td><td class="text-left">';
-
-                    $.each(pathResult['operations'], function(operationIdx, operation) {
-                        newRow += getButton(operation);
-                    })
-
-                    rows += '</td></tr>' + newRow;
-                    previousName = service['name'];
-                })
-            });
-
-            $("#services").html(rows);
-
+function getNamespace() {
+    $.getJSON({url: window.location.origin + "/services/namespace",
+        success: function(data) {
+            $("#namespace").html('Namespace: ' + data['namespace']);
         },
         error:  function(result) {
-            $("#services").html("<tr><td colspan=\"4\">Oh no - error getting services!</td></tr>");
+            $("#namespace").html('ERROR');
         }
     });
-    reload();
 }
+
+function getIngressedServices() {
+    console.log("getting ingressed services...");
+    $.getJSON({url: window.location.origin + "/services/ingressed",
+        success: function(services) {
+            $("#ingressedServices").html(renderRows(services));
+        },
+        error:  function(result) {
+            $("#ingressedServices").html("<tr><td colspan=\"4\">Oh no - error getting services!</td></tr>");
+        }
+    });
+    reloadIngressed();
+}
+
+function getNonIngressedServices() {
+    console.log("getting nonIngressed services...");
+    $.getJSON({url: window.location.origin + "/services/nonIngressed",
+        success: function(services) {
+            console.log(services);
+            $("#nonIngressedServices").html(renderRows(services));
+        },
+        error:  function(result) {
+            $("#nonIngressedServices").html("<tr><td colspan=\"4\">Oh no - error getting services!</td></tr>");
+        }
+    });
+    reloadNonIngressed();
+}
+
+function renderRows(services) {
+
+    var rows = "";
+    var previousName = "";
+    $.each(services, function(idx, service) {
+
+        $.each(service['pathResults'], function(pathIdx, pathResult) {
+            var newRow = '<tr class="text-left">';
+
+            if (service['name'] === previousName) {
+                newRow += '<td colspan="2"/>';
+            } else {
+                newRow += '<td class="lead">' + service['name'] + '</td>';
+
+                newRow += '<td>'
+                if (service['openapiUrl'] != null) {
+                   newRow += '<a href="' + service['openapiUrl'] + '">Openapi</a>';
+                }
+
+                if (service['openapiUiUrl'] != null) {
+                    newRow += ' / <a href="' + service['openapiUiUrl'] + '">UI</a>';
+                }
+
+                newRow += '</td>';
+            }
+
+            newRow += '<td class="lead">' + pathResult['path'] + '</td>';
+            newRow += '<td>';
+
+            $.each(pathResult['operations'], function(operationIdx, operation) {
+                newRow += getButton(operation);
+            });
+
+            newRow += '</td>';
+            newRow += '</tr>';
+            rows += newRow;
+
+            previousName = service['name'];
+        });
+
+    });
+
+    return rows;
+}
+
 
 //map operations to colors
 function getButton(operation) {
@@ -60,19 +99,16 @@ function getButton(operation) {
     return '<button type="button" class="btn ' + className + ' mr-1" aria-disabled="true" disabled>' + operation + '</button>';
 }
 
-function reload() {
-   setTimeout(getServices, 30000);
+function reloadIngressed() {
+   setTimeout(getIngressedServices, 30000);
+}
+
+function reloadNonIngressed() {
+   setTimeout(getNonIngressedServices, 30000);
 }
 
 $(document).ready(function(){
-    getServices();
-
-    $.getJSON({url: window.location.origin + "/services/namespace",
-        success: function(data) {
-            $("#namespace").html('Namespace: ' + data['namespace']);
-        },
-        error:  function(result) {
-            $("#namespace").html('ERROR');
-        }
-    });
+    getNamespace();
+    getIngressedServices();
+    getNonIngressedServices();
 });

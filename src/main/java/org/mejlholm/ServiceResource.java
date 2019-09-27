@@ -27,9 +27,19 @@ public class ServiceResource {
     @ConfigProperty(name = "NAMESPACE")
     private String namespace;
 
+    // TODO: 9/27/19 add feature to filter using labels from kubernetes
+
+
     @GET
-    public Response getServices() {
-        return Response.ok().entity(serviceCollector.getServices()).build();
+    @Path("ingressed")
+    public Response getIngressedServices() {
+        return Response.ok().entity(serviceCollector.getIngressedServices()).build();
+    }
+
+    @GET
+    @Path("nonIngressed")
+    public Response getNonIngressedServices() {
+        return Response.ok().entity(serviceCollector.getNonIngressedServices()).build();
     }
 
     @GET

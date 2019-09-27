@@ -23,7 +23,8 @@
                 <br/>
 
                 <h2 class="display-5" id="namespace"></h2>
-                <h2 class="display-5">Endpoints with ingresses</h2>
+
+                <h3 class="display-5">Endpoints with ingresses</h3>
                 <table class="table">
                     <thead class="thead-dark">
                     <tr>
@@ -33,7 +34,21 @@
                         <th scope="col" class="text-left">Operations</th>
                     </tr>
                     </thead>
-                    <tbody id="services">
+                    <tbody id="ingressedServices">
+                    </tbody>
+                </table>
+
+                <h3 class="display-5">Endpoints without ingresses</h3>
+                <table class="table">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-left">Service name</th>
+                        <th scope="col" class="text-left">Links</th>
+                        <th scope="col" class="text-left">Path</th>
+                        <th scope="col" class="text-left">Operations</th>
+                    </tr>
+                    </thead>
+                    <tbody id="nonIngressedServices">
                     </tbody>
                 </table>
 

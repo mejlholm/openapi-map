@@ -1,5 +1,6 @@
 package org.mejlholm;
 
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.fabric8.kubernetes.api.model.extensions.IngressRule;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -23,8 +24,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Slf4j
@@ -37,10 +40,17 @@ public class ServiceCollector {
         this.kubernetesClient = kubernetesClient;
     }
 
-    private List<ServiceResult> services = new ArrayList<>();
+    private Map<String, String> knownServices = new HashMap<>();
+    private List<ServiceResult> ingressedServices = new ArrayList<>();
+    private List<ServiceResult> nonIngressedServices = new ArrayList<>();
 
-    List<ServiceResult> getServices() {
-        return services;
+
+    List<ServiceResult> getIngressedServices() {
+        return ingressedServices;
+    }
+
+    List<ServiceResult> getNonIngressedServices() {
+        return nonIngressedServices;
     }
 
     @ConfigProperty(name = "NAMESPACE")
@@ -50,39 +60,34 @@ public class ServiceCollector {
     @Scheduled(every = "10m")
     void collectServices() {
 
-        Client client = ClientBuilder.newClient(); // TODO: 9/27/19 cache better
+        Client client = ClientBuilder.newClient();
 
         List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
         List<ServiceResult> results = new ArrayList<>();
         for (Ingress i: ingresses) {
 
+            String serviceName = i.getMetadata().getName();
+
             //todo, the edge case needs around rules need some more thought, can we only run into http?
-            List<PathResult> pathResults = null;
             IngressRule rule = i.getSpec().getRules().get(0);
             final String openapiUrl = "http://" + rule.getHost() + "/openapi";
-            try {
-                pathResults = parseOpenapi(openapiUrl);
-            } catch (IOException e) {
-                log.info("Unable to open url: " + openapiUrl);
-            }
-
-
-            results.add(new ServiceResult(i.getMetadata().getName(), openapiUrl, getOpenapiUiUrl(client, rule), pathResults));
+            knownServices.put(serviceName, serviceName);
+            results.add(new ServiceResult(serviceName, openapiUrl, getOpenapiUiUrl(client, rule), parseOpenapi(openapiUrl)));
         }
 
-        services = results;
+        ingressedServices = results;
 
-        // TODO: 9/26/19 make overview of non-ingressed services 
-
-        // TODO: 9/27/19 filter using labels from kubernetes
+        List<Service> services = kubernetesClient.services().inNamespace(namespace).list().getItems();
+        nonIngressedServices = services.stream()
+                .filter(s -> !knownServices.containsKey(s.getMetadata().getName()))
+                .map(s -> new ServiceResult(s.getMetadata().getName(), null, null, parseOpenapi("http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi")))
+                .collect(Collectors.toList());
 
         client.close();
     }
 
     private String getOpenapiUiUrl(Client client, IngressRule rule) {
-
-
         String[] possibleUiPaths = {"/openapi/ui", "/swagger-ui"}; //other???
         for (String path: possibleUiPaths) {
             String fullPath = "http://" + rule.getHost() + "/" + path;
@@ -91,17 +96,25 @@ public class ServiceCollector {
                 return fullPath;
             }
         }
-
-
         return null;
     }
 
-    private List<PathResult> parseOpenapi(String baseUrl) throws IOException {
-        InputStream input = new URL(baseUrl).openStream();
-        OpenAPI openAPI = OpenApiParser.parse(input, OpenApiSerializer.Format.YAML);
+    private List<PathResult> parseOpenapi(String baseUrl) {
+
+        System.out.println(baseUrl);
+        List<PathResult> results = new ArrayList<>();
+
+        OpenAPI openAPI;
+        try {
+            InputStream input = new URL(baseUrl).openStream();
+            openAPI = OpenApiParser.parse(input, OpenApiSerializer.Format.YAML);
+        } catch (IOException e) {
+            log.info("Unable to open url: " + baseUrl);
+            return results;
+        }
+
         Paths paths = openAPI.getPaths();
 
-        List<PathResult> results = new ArrayList<>();
         for (Map.Entry<String, PathItem> entry : paths.getPathItems().entrySet()) {
             results.add(new PathResult(entry.getKey(), getPathOperations(entry.getValue())));
         }

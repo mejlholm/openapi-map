@@ -13,7 +13,7 @@ metadata:
   namespace: apps
 rules:
   - apiGroups: ["", "extensions"]
-    resources: ["pods", "services", "ingresses"]
+    resources: ["services", "ingresses"]
     verbs: ["list"]
 
 ---
