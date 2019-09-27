@@ -101,7 +101,6 @@ public class ServiceCollector {
 
     private List<PathResult> parseOpenapi(String baseUrl) {
 
-        System.out.println(baseUrl);
         List<PathResult> results = new ArrayList<>();
 
         OpenAPI openAPI;
