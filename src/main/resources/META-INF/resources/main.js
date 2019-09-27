@@ -1,6 +1,6 @@
 function getServices() {
     console.log("getting services...");
-    $.getJSON({url: window.location.origin + "/service",
+    $.getJSON({url: window.location.origin + "/services",
         success: function(services) {
 
             var rows = "";
@@ -58,4 +58,13 @@ function reload() {
 
 $(document).ready(function(){
     getServices();
+
+    $.getJSON({url: window.location.origin + "/services/namespace",
+        success: function(data) {
+            $("#namespace").html('Namespace: ' + data['namespace']);
+        },
+        error:  function(result) {
+            $("#namespace").html('ERROR');
+        }
+    });
 });

@@ -62,6 +62,8 @@ public class ServiceCollector {
                 log.info("Unable to open url: " + url);
             }
 
+            // TODO: 9/27/19 try to get swagger ui urls by guessing / use service metadata 
+            
             results.add(new ServiceResult(i.getMetadata().getName(), url, pathResults));
         }
         services = results;

@@ -1,29 +1,43 @@
 package org.mejlholm;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.annotation.Metered;
-import org.mejlholm.model.ServiceResult;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+import javax.ws.rs.core.Response;
 
-@Path("/service")
+@Path("services")
 @ApplicationScoped
 @Metered
 @Slf4j
+@Produces(MediaType.APPLICATION_JSON)
 public class ServiceResource {
 
     @Inject
     ServiceCollector serviceCollector;
 
+    @ConfigProperty(name = "NAMESPACE")
+    private String namespace;
+
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<ServiceResult> getServices() {
-        return serviceCollector.getServices();
+    public Response getServices() {
+        return Response.ok().entity(serviceCollector.getServices()).build();
+    }
+
+    @GET
+    @Path("namespace")
+    public Response getNamespace() {
+        JsonObject payload = Json.createObjectBuilder()
+                .add("namespace", namespace).build();
+
+        return Response.ok().entity(payload.toString()).build();
     }
 }
