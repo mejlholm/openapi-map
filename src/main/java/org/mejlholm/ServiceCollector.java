@@ -55,16 +55,17 @@ public class ServiceCollector {
             //fixme, the edge case needs some more thought
             List<PathResult> pathResults = null;
             IngressRule rule = i.getSpec().getRules().get(0);
-            final String url = "http://" + rule.getHost() + "/openapi";
+            final String openapiUrl = "http://" + rule.getHost() + "/openapi";
             try {
-                pathResults = parseOpenapi(url);
+                pathResults = parseOpenapi(openapiUrl);
             } catch (IOException e) {
-                log.info("Unable to open url: " + url);
+                log.info("Unable to open url: " + openapiUrl);
             }
 
-            // TODO: 9/27/19 try to get swagger ui urls by guessing / use service metadata 
-            
-            results.add(new ServiceResult(i.getMetadata().getName(), url, pathResults));
+            // TODO: 9/27/19 try to get openapiUiUrl and only show if it exists. Also try /openapi/ui
+            final String openapiUiUrl = "http://" + rule.getHost() + "/swagger-ui";
+
+            results.add(new ServiceResult(i.getMetadata().getName(), openapiUrl, openapiUiUrl, pathResults));
         }
         services = results;
 

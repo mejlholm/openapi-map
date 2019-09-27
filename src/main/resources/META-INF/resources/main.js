@@ -10,9 +10,11 @@ function getServices() {
                 $.each(service['pathResults'], function(pathIdx, pathResult) {
 
                     if (service['name'] === previousName) {
-                        var newRow = '<tr><td colspan="2"/>';
+                        var newRow = '<tr><td colspan="3"/>';
                     } else {
-                        var newRow = '<tr><td class="text-left lead">' + service['name'] + '</td><td class="text-left"><a href="' + service['openapiUrl'] + '">Link</a></td>';
+                        var newRow = '<tr><td class="text-left lead">' + service['name'] + '</td>';
+                        newRow += '<td class="text-left"><a href="' + service['openapiUrl'] + '">Link</a></td>';
+                        newRow += '<td class="text-left"><a href="' + service['openapiUiUrl'] + '">Link</a></td>';
                     }
                     newRow += '<td class="text-left lead">' + pathResult['path'] + '</td><td class="text-left">';
 
@@ -29,7 +31,7 @@ function getServices() {
 
         },
         error:  function(result) {
-            $("#services").html("<tr><td colspan=\"4\">Oh no - error getting services!</td></tr>");
+            $("#services").html("<tr><td colspan=\"5\">Oh no - error getting services!</td></tr>");
         }
     });
     reload();

@@ -11,6 +11,7 @@ public class ServiceResult {
 
     private final String name;
     private final String openapiUrl;
+    private final String openapiUiUrl;
     private final List<PathResult> pathResults;
 
 }
