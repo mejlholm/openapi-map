@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="openapiMapApp">
 <head>
     <meta charset="UTF-8">
     <title>OpenAPI Map</title>
@@ -8,11 +8,15 @@
 
     <style>
         body,html {height: 100%;}
+
     </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+    <script src="/openapi-map.js"></script>
 </head>
 <body>
 
-<div class="container h-100">
+<div class="container h-100" ng-controller="OpenAPIMapController">
     <div class="row align-items-center h-100">
         <div class="col-12 mx-auto">
             <div style="background:transparent !important" class="jumbotron jumbotron-fluid text-center">
@@ -22,7 +26,7 @@
                 <br/>
                 <br/>
 
-                <h2 class="display-5" id="namespace"></h2>
+                <h2 class="display-5" id="namespace">Namespace: {{namespace}}</h2>
 
                 <h3 class="display-5">Endpoints with ingresses</h3>
                 <table class="table">
@@ -35,6 +39,24 @@
                     </tr>
                     </thead>
                     <tbody id="ingressedServices">
+                    <tr ng-repeat="service in ingressedServices">
+                        <div ng-repeat="pathResult in service.pathResults">
+                            <div ng-repeat="result in pathResult">
+                                <td class="lead">{{service.name}}</td>
+                                <td class="lead"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                                    <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
+                                </td>
+                                <td class="lead">{{result.path}}</td>
+                                <td class="lead">
+                                    <div ng-repeat="operation in result.operations">
+                                        <button type="button" class="btn {{renderOperation(operation)}} mr-1"
+                                                aria-disabled="true" disabled>{{operation}}
+                                        </button>
+                                    </div>
+                                </td>
+                            </div>
+                        </div>
+                    </tr>
                     </tbody>
                 </table>
 
@@ -57,12 +79,5 @@
     </div>
 </div>
 
-<!-- Bootstrap core JavaScript
-================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-<script src="/main.js"></script>
 </body>
 </html>

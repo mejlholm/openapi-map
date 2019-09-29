@@ -1,14 +1,41 @@
-function getNamespace() {
-    $.getJSON({url: window.location.origin + "/services/namespace",
-        success: function(data) {
-            $("#namespace").html('Namespace: ' + data['namespace']);
-        },
-        error:  function(result) {
-            $("#namespace").html('ERROR');
-        }
-    });
-}
+angular.module('openapiMapApp', [])
+  .controller('OpenAPIMapController', function($scope, $http) {
+    $http.get('/services/namespace')
+        .then(function(response){
+            $scope.namespace = response.data['namespace'];
+        }, function(response){
+            $scope.namespace = "ERROR";
+        });
 
+    $http.get('/services/ingressed')
+        .then(function(response){
+            console.log(response.data);
+            $scope.ingressedServices = response.data;
+        });
+
+    $http.get('/services/nonIngressed')
+        .then(function(response){
+            $scope.nonIngressedServices = response.data;
+        });
+
+    $scope.renderOperation = function(operation) {
+        var className = "btn-secondary"; //default color for the more exotic operations
+
+        if (operation === 'GET'){
+            className = "btn-primary";
+        } else if (operation === 'DELETE') {
+            className = 'btn-danger';
+        } else if (operation === 'POST') {
+            className = 'btn-success';
+        } else if (operation === 'PUT') {
+            className = 'btn-warning';
+        }
+        return className;
+    }
+
+});
+
+/*
 function getIngressedServices() {
     console.log("getting ingressed services...");
     $.getJSON({url: window.location.origin + "/services/ingressed",
@@ -112,3 +139,5 @@ $(document).ready(function(){
     getIngressedServices();
     getNonIngressedServices();
 });
+
+*/
