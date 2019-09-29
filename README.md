@@ -6,6 +6,11 @@
 
 OpenAPI map is a kubernetes application that looks for applications exposing OpenAPI endpoints inside your cluster and aggregates these into a single webpage for a quick overview of you services. From there you can click to the OpenAPI swagger UIs can explore further. 
 
+* ** Aggregated view **:
+Get an easy overview of the service endpoints in your namespace.
+* ** Simple config **:
+Just configure the namespace it should be looking at.
+
 Built on [Quarkus.io](https://quarkus.io/) and a bit of jquery, 
 
 ## Getting started
