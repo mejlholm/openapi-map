@@ -4,7 +4,7 @@
 
 # OpenAPI Map
 
-OpenAPI map is a kubernetes application that looks for applications exposing OpenAPI inside your cluster and aggregates these into a single webpage for a quick overview of you services.
+OpenAPI map is a kubernetes application that looks for applications exposing OpenAPI endpoints inside your cluster and aggregates these into a single webpage for a quick overview of you services. From there you can click to the OpenAPI swagger UIs can explore further. 
 
 Built on [Quarkus.io](https://quarkus.io/) and a bit of jquery, 
 
