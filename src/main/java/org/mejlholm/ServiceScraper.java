@@ -83,7 +83,7 @@ public class ServiceScraper {
 
 
         List<Service> services = kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
-                .filter(s -> knownServices.containsKey(s.getMetadata().getName()))
+                .filter(s -> !knownServices.containsKey(s.getMetadata().getName()))
                 .collect(Collectors.toList());
         List<PathResult> serviceResults = new ArrayList<>();
         for (Service s: services) {
