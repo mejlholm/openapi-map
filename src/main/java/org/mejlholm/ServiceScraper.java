@@ -89,7 +89,7 @@ public class ServiceScraper {
         for (Service s: services) {
             String serviceName = s.getMetadata().getName();
             final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
-            serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl));
+            serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl)); //we won't provide links to url's that can't be reached.
         }
 
         nonIngressedServices = serviceResults;
