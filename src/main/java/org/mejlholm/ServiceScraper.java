@@ -30,11 +30,11 @@ import java.util.Map;
 @ApplicationScoped
 @Slf4j
 @Traced
-public class ServiceCollector {
+public class ServiceScraper {
 
     private final KubernetesClient kubernetesClient;
 
-    public ServiceCollector(KubernetesClient kubernetesClient) {
+    public ServiceScraper(KubernetesClient kubernetesClient) {
         this.kubernetesClient = kubernetesClient;
     }
 
@@ -97,8 +97,6 @@ public class ServiceCollector {
             Response response = client.target(fullPath).request().get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 return fullPath;
-            } else {
-                log.warn("Unable to find ui on url: " + fullPath);
             }
         }
         return null;

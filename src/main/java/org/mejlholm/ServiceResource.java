@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 public class ServiceResource {
 
     @Inject
-    ServiceCollector serviceCollector;
+    ServiceScraper serviceCollector;
 
     @ConfigProperty(name = "NAMESPACE")
     private String namespace;
