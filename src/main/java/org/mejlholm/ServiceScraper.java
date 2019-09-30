@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @ApplicationScoped
 @Slf4j
@@ -58,7 +59,10 @@ public class ServiceScraper {
     @Scheduled(every = "10m")
     void collectServices() {
 
-        Client client = ClientBuilder.newClient();
+        ClientBuilder clientBuilder = ClientBuilder.newBuilder();
+        clientBuilder.connectTimeout(1, TimeUnit.SECONDS);
+        clientBuilder.readTimeout(1, TimeUnit.SECONDS);
+        Client client = clientBuilder.build();
 
         List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
