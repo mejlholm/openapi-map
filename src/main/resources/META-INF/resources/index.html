@@ -40,22 +40,17 @@
                     </thead>
                     <tbody id="ingressedServices">
                     <tr ng-repeat="service in ingressedServices">
-                        <div ng-repeat="pathResult in service.pathResults">
-                            <div ng-repeat="result in pathResult">
-                                <td class="lead">{{service.name}}</td>
-                                <td class="lead"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
-                                    <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
-                                </td>
-                                <td class="lead">{{result.path}}</td>
-                                <td class="lead">
-                                    <div ng-repeat="operation in result.operations">
-                                        <button type="button" class="btn {{renderOperation(operation)}} mr-1"
-                                                aria-disabled="true" disabled>{{operation}}
-                                        </button>
-                                    </div>
-                                </td>
+                        <td class="lead">{{service.name}}</td>
+                        <td class="lead"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                            <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
+                        </td>
+                        <td class="lead">{{service.path}}</td>
+                        <td class="lead">
+                            <div ng-repeat="operation in service.operations">
+                                <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}
+                                </button>
                             </div>
-                        </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -71,6 +66,19 @@
                     </tr>
                     </thead>
                     <tbody id="nonIngressedServices">
+                    <tr ng-repeat="service in nonIngressedServices">
+                        <td class="lead">{{service.name}}</td>
+                        <td class="lead"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                            <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
+                        </td>
+                        <td class="lead">{{service.path}}</td>
+                        <td class="lead">
+                            <div ng-repeat="operation in service.operations">
+                                <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
 

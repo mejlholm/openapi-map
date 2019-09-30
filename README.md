@@ -13,7 +13,7 @@ Just configure the namespace it should be looking at.
 
 ![OpenAPI Map](openapi-map.png)
 
-Built on [Quarkus.io](https://quarkus.io/) and a bit of jquery, 
+Built on [Quarkus.io](https://quarkus.io/) and a bit of angular, 
 
 ## Getting started
 
