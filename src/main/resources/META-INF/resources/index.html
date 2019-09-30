@@ -40,12 +40,12 @@
                     </thead>
                     <tbody id="ingressedServices">
                     <tr ng-repeat="service in ingressedServices">
-                        <td class="lead">{{service.name}}</td>
-                        <td class="lead"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                        <td class="lead text-left">{{service.name}}</td>
+                        <td class="lead text-left"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
                             <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
                         </td>
-                        <td class="lead">{{service.path}}</td>
-                        <td class="lead">
+                        <td class="lead text-left">{{service.path}}</td>
+                        <td class="lead text-left">
                             <div ng-repeat="operation in service.operations">
                                 <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}
                                 </button>
@@ -67,12 +67,12 @@
                     </thead>
                     <tbody id="nonIngressedServices">
                     <tr ng-repeat="service in nonIngressedServices">
-                        <td class="lead">{{service.name}}</td>
-                        <td class="lead"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                        <td class="lead text-left">{{service.name}}</td>
+                        <td class="lead text-left"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
                             <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
                         </td>
-                        <td class="lead">{{service.path}}</td>
-                        <td class="lead">
+                        <td class="lead text-left">{{service.path}}</td>
+                        <td class="lead text-left">
                             <div ng-repeat="operation in service.operations">
                                 <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}
                                 </button>
