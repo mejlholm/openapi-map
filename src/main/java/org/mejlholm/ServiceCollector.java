@@ -14,7 +14,6 @@ import org.eclipse.microprofile.openapi.models.PathItem;
 import org.eclipse.microprofile.openapi.models.Paths;
 import org.eclipse.microprofile.opentracing.Traced;
 import org.mejlholm.model.PathResult;
-import org.mejlholm.model.ServiceResult;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.client.Client;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Slf4j
@@ -41,15 +39,15 @@ public class ServiceCollector {
     }
 
     private Map<String, String> knownServices = new HashMap<>();
-    private List<ServiceResult> ingressedServices = new ArrayList<>();
-    private List<ServiceResult> nonIngressedServices = new ArrayList<>();
+    private List<PathResult> ingressedServices = new ArrayList<>();
+    private List<PathResult> nonIngressedServices = new ArrayList<>();
 
 
-    List<ServiceResult> getIngressedServices() {
+    List<PathResult> getIngressedServices() {
         return ingressedServices;
     }
 
-    List<ServiceResult> getNonIngressedServices() {
+    List<PathResult> getNonIngressedServices() {
         return nonIngressedServices;
     }
 
@@ -64,25 +62,30 @@ public class ServiceCollector {
 
         List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
-        List<ServiceResult> results = new ArrayList<>();
+        List<PathResult> results = new ArrayList<>();
         for (Ingress i: ingresses) {
-
             String serviceName = i.getMetadata().getName();
 
             //todo, the edge case needs around rules need some more thought, can we only run into http?
             IngressRule rule = i.getSpec().getRules().get(0);
             final String openapiUrl = "http://" + rule.getHost() + "/openapi";
             knownServices.put(serviceName, serviceName);
-            results.add(new ServiceResult(serviceName, openapiUrl, getOpenapiUiUrl(client, rule), parseOpenapi(openapiUrl)));
+            results.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule), openapiUrl));
         }
 
         ingressedServices = results;
 
+
+
         List<Service> services = kubernetesClient.services().inNamespace(namespace).list().getItems();
-        nonIngressedServices = services.stream()
-                .filter(s -> !knownServices.containsKey(s.getMetadata().getName()))
-                .map(s -> new ServiceResult(s.getMetadata().getName(), null, null, parseOpenapi("http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi")))
-                .collect(Collectors.toList());
+        List<PathResult> results2 = new ArrayList<>();
+        for (Service s: services) {
+            String serviceName = s.getMetadata().getName();
+            final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
+            results.addAll(parseOpenapi(serviceName, null, null, openapiUrl));
+        }
+
+        nonIngressedServices = results2;
 
         client.close();
     }
@@ -99,7 +102,7 @@ public class ServiceCollector {
         return null;
     }
 
-    private List<PathResult> parseOpenapi(String baseUrl) {
+    private List<PathResult> parseOpenapi(String name, String openapiUiUrl, String openapiUrl, String baseUrl) {
 
         List<PathResult> results = new ArrayList<>();
 
@@ -115,7 +118,7 @@ public class ServiceCollector {
         Paths paths = openAPI.getPaths();
 
         for (Map.Entry<String, PathItem> entry : paths.getPathItems().entrySet()) {
-            results.add(new PathResult(entry.getKey(), getPathOperations(entry.getValue())));
+            results.add(new PathResult(name, openapiUiUrl, openapiUrl, entry.getKey(), getPathOperations(entry.getValue())));
         }
         return results;
     }
