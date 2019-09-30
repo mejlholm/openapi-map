@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 @Slf4j
@@ -66,7 +67,7 @@ public class ServiceScraper {
 
         List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
-        List<PathResult> results = new ArrayList<>();
+        List<PathResult> ingressResults = new ArrayList<>();
         for (Ingress i: ingresses) {
             String serviceName = i.getMetadata().getName();
 
@@ -74,22 +75,24 @@ public class ServiceScraper {
             IngressRule rule = i.getSpec().getRules().get(0);
             final String openapiUrl = "http://" + rule.getHost() + "/openapi";
             knownServices.put(serviceName, serviceName);
-            results.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl));
+            ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl));
         }
 
-        ingressedServices = results;
+        ingressedServices = ingressResults;
 
 
 
-        List<Service> services = kubernetesClient.services().inNamespace(namespace).list().getItems();
-        List<PathResult> results2 = new ArrayList<>();
+        List<Service> services = kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
+                .filter(s -> knownServices.containsKey(s.getMetadata().getName()))
+                .collect(Collectors.toList());
+        List<PathResult> serviceResults = new ArrayList<>();
         for (Service s: services) {
             String serviceName = s.getMetadata().getName();
             final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
-            results.addAll(parseOpenapi(serviceName, null, null, openapiUrl));
+            serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl));
         }
 
-        nonIngressedServices = results2;
+        nonIngressedServices = serviceResults;
 
         client.close();
     }
