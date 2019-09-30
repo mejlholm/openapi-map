@@ -70,7 +70,7 @@ public class ServiceCollector {
             IngressRule rule = i.getSpec().getRules().get(0);
             final String openapiUrl = "http://" + rule.getHost() + "/openapi";
             knownServices.put(serviceName, serviceName);
-            results.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule), openapiUrl));
+            results.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl));
         }
 
         ingressedServices = results;
@@ -90,13 +90,15 @@ public class ServiceCollector {
         client.close();
     }
 
-    private String getOpenapiUiUrl(Client client, IngressRule rule) {
-        String[] possibleUiPaths = {"/openapi/ui", "/swagger-ui"}; //other???
+    private String getOpenapiUiUrl(Client client, String host) {
+        String[] possibleUiPaths = {"/openapi/ui/", "/swagger-ui/"}; //other???
         for (String path: possibleUiPaths) {
-            String fullPath = "http://" + rule.getHost() + "/" + path;
+            String fullPath = "http://" + host + path;
             Response response = client.target(fullPath).request().get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 return fullPath;
+            } else {
+                log.warn("Unable to find ui on url: " + fullPath);
             }
         }
         return null;
