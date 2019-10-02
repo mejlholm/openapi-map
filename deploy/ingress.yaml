@@ -3,7 +3,7 @@ kind: Ingress
 apiVersion: networking.k8s.io/v1beta1
 metadata:
   name: openapi-map
-  namespace: apps
+  namespace: openapi-map
 spec:
   rules:
   - host: openapi-map.mejlholm.org
