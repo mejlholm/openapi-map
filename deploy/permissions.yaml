@@ -3,14 +3,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: openapi-map
-  namespace: apps
+  namespace: openapi-map
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
   name: openapi-map
-  namespace: apps
 rules:
   - apiGroups: ["", "extensions"]
     resources: ["services", "ingresses"]
@@ -18,15 +17,14 @@ rules:
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: openapi-map
-  namespace: apps
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: openapi-map
   apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
     name: openapi-map
-    namespace: apps
+    namespace: openapi-map
