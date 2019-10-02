@@ -8,7 +8,6 @@
 
     <style>
         body,html {height: 100%;}
-
     </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
@@ -48,8 +47,7 @@
                         <td class="lead text-left">{{service.path}}</td>
                         <td class="lead text-left">
                             <div ng-repeat="operation in service.operations">
-                                <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}
-                                </button>
+                                <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}</button>
                             </div>
                         </td>
                     </tr>
