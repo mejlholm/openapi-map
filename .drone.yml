@@ -39,4 +39,7 @@ steps:
 trigger:
   branch:
     excludes: master
-  event: pull_request
+  event:
+    include:
+    - push
+    - pull_request
