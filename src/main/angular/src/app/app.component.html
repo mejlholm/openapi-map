@@ -1,0 +1,78 @@
+<mat-toolbar color="primary">OpenApi Map</mat-toolbar>
+
+<router-outlet></router-outlet>
+
+<!--<div class="container h-100">
+  <div class="row align-items-center h-100">
+    <div class="col-12 mx-auto">
+      <div style="background:transparent !important" class="jumbotron jumbotron-fluid text-center">
+        <h1 class="display-4">OpenAPI Map</h1>
+        <p class="lead font-italic">Aggregated OpenAPI services in your cluster</p>
+
+        <br/>
+        <br/>
+
+        <h2 class="display-5" id="namespace">Namespace: {{namespace}}</h2>
+
+        <h3 class="display-5">Endpoints with ingresses</h3>
+        <table class="table">
+          <thead class="thead-dark">
+          <tr>
+            <th scope="col" class="text-left">Service name</th>
+            <th scope="col" class="text-left">Links</th>
+            <th scope="col" class="text-left">Path</th>
+            <th scope="col" class="text-left">Operations</th>
+          </tr>
+          </thead>
+          <tbody id="ingressedServices">
+          <tr *ngFor="let service of ingressedServices">
+            <td class="lead text-left">{{service.name}}</td>
+            <td class="lead text-left">
+              <a *ngIf="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">OpenAPI</a>
+              <a *ngIf="service.openapiUiUrl == null" target="_blank" href="{{service.openapiUiUrl}}">| UI</a>
+            </td>
+            <td class="lead text-left">{{service.path}}</td>
+            <td class="lead text-left">
+              <div *ngFor="let operation of service.operations">
+                <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true"
+                        disabled>{{operation}}</button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <h3 class="display-5">Endpoints without ingresses</h3>
+        <table class="table">
+          <thead class="thead-dark">
+          <tr>
+            <th scope="col" class="text-left">Service name</th>
+            <th scope="col" class="text-left">Links</th>
+            <th scope="col" class="text-left">Path</th>
+            <th scope="col" class="text-left">Operations</th>
+          </tr>
+          </thead>
+          <tbody id="nonIngressedServices">
+          <tr *ngFor="let service of nonIngressedServices">
+            <td class="lead text-left">{{service.name}}</td>
+            <td class="lead text-left"><a *ngIf="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+              <a *ngIf="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
+            </td>
+            <td class="lead text-left">{{service.path}}</td>
+            <td class="lead text-left">
+              <div *ngFor="let operation of service.operations">
+                <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true"
+                        disabled>{{operation}}
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>-->
+
+
