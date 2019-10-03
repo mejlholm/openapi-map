@@ -23,7 +23,7 @@ trigger:
 ---
 
 kind: pipeline
-name: default
+name: default-build-only
 
 steps:
   - name: build-openapi-map
