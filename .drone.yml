@@ -10,6 +10,7 @@ steps:
         from_secret: docker_hub_username
       password:
         from_secret: docker_hub_password
+      dockerfile: Dockerfile.graalvm
       tags:
         - latest
         - 0.0.${DRONE_BUILD_NUMBER}
@@ -36,6 +37,7 @@ steps:
         from_secret: docker_hub_username
       password:
         from_secret: docker_hub_password
+      dockerfile: Dockerfile.graalvm
 
 trigger:
   branch:
