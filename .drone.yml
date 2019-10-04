@@ -20,3 +20,26 @@ trigger:
   event:
     exclude:
     - tag
+---
+
+kind: pipeline
+name: default-build-only
+
+steps:
+  - name: build-openapi-map
+    image: plugins/docker
+    settings:
+      repo: mejlholm/openapi-map
+      dry_run: true
+      username:
+        from_secret: docker_hub_username
+      password:
+        from_secret: docker_hub_password
+
+trigger:
+  branch:
+    excludes: master
+  event:
+    include:
+    - push
+    - pull_request
