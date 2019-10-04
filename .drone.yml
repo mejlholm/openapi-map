@@ -1,4 +1,5 @@
 kind: pipeline
+type: docker
 name: default
 
 steps:
@@ -18,13 +19,12 @@ steps:
 trigger:
   branch:
     - master
-  exclude:
-    event:
-    - tag
-    - pull_request
+  event:
+    - push
 ---
 
 kind: pipeline
+type: docker
 name: default-build-only
 
 steps:
@@ -40,10 +40,9 @@ steps:
       dockerfile: Dockerfile.graalvm
 
 trigger:
-  excludes:
+  exclude:
     branch:
-    - master
+      - master
   include:
     event:
-    - push
     - pull_request
