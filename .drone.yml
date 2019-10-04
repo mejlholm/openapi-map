@@ -1,5 +1,4 @@
 kind: pipeline
-type: docker
 name: default
 
 steps:
@@ -11,20 +10,20 @@ steps:
         from_secret: docker_hub_username
       password:
         from_secret: docker_hub_password
-      dockerfile: Dockerfile.graalvm
       tags:
         - latest
         - 0.0.${DRONE_BUILD_NUMBER}
 
 trigger:
-  branch:
+  include:
+    branch:
     - master
-  event:
+  exclude:
+    event:
     - push
----
 
+---
 kind: pipeline
-type: docker
 name: default-build-only
 
 steps:
@@ -37,12 +36,11 @@ steps:
         from_secret: docker_hub_username
       password:
         from_secret: docker_hub_password
-      dockerfile: Dockerfile.graalvm
 
 trigger:
   exclude:
     branch:
-      - master
+    - master
   include:
     event:
     - pull_request
