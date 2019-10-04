@@ -20,6 +20,8 @@ trigger:
   event:
     exclude:
     - tag
+    - push
+    - pull_request
 ---
 
 kind: pipeline
