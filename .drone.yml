@@ -18,8 +18,8 @@ steps:
 trigger:
   branch:
     - master
-  event:
-    exclude:
+  exclude:
+    event:
     - tag
     - pull_request
 ---
@@ -40,9 +40,10 @@ steps:
       dockerfile: Dockerfile.graalvm
 
 trigger:
-  branch:
-    excludes: master
-  event:
-    include:
+  excludes:
+    branch:
+    - master
+  include:
+    event:
     - push
     - pull_request
