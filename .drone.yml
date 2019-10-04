@@ -15,11 +15,10 @@ steps:
         - 0.0.${DRONE_BUILD_NUMBER}
 
 trigger:
-  include:
-    branch:
+  branch:
+    include:
     - master
-  exclude:
-    event:
+  event:
     - push
 
 ---
@@ -38,9 +37,6 @@ steps:
         from_secret: docker_hub_password
 
 trigger:
-  exclude:
-    branch:
+  branch:
+    exclude:
     - master
-  include:
-    event:
-    - pull_request
