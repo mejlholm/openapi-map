@@ -45,7 +45,7 @@
                             <a ng-hide="service.openapiUiUrl == null" target="_blank" href="{{service.openapiUiUrl}}">| UI</a>
                         </td>
                         <td class="lead text-left">{{service.path}}</td>
-                        <td class="lead text-left">
+                        <td class="lead text-left text-nowrap">
                             <div ng-repeat="operation in service.operations">
                                 <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}</button>
                             </div>
@@ -71,7 +71,7 @@
                             <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
                         </td>
                         <td class="lead text-left">{{service.path}}</td>
-                        <td class="lead text-left">
+                        <td class="lead text-left text-nowrap">
                             <div ng-repeat="operation in service.operations">
                                 <button type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}
                                 </button>

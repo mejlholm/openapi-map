@@ -53,7 +53,7 @@ public class ServiceScraper {
         return nonIngressedServices;
     }
 
-    @ConfigProperty(name = "NAMESPACE")
+    @ConfigProperty(name = "NAMESPACE", defaultValue = "default")
     private String namespace;
 
 

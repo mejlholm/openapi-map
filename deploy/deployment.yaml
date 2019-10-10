@@ -6,7 +6,6 @@ metadata:
   namespace: openapi-map
   labels:
     app: openapi-map
-  annotations:
 spec:
   replicas: 1
   selector:
@@ -24,13 +23,13 @@ spec:
       serviceAccountName: openapi-map
       containers:
       - name: openapi-map
-        image: mejlholm/openapi-map:0.0.30
+        image: mejlholm/openapi-map:0.0.42
         resources:
           limits:
             memory: "256Mi"
         env:
         - name: NAMESPACE
-          value: 'apps'
+          value: 'default'
         - name: JAEGER_ENDPOINT
           value: 'http://jaeger-collector.monitoring:14268/api/traces'
         - name: JAEGER_SAMPLER_TYPE
