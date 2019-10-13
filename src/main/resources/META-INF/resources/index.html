@@ -67,7 +67,8 @@
                     <tbody id="nonIngressedServices">
                     <tr ng-repeat="service in nonIngressedServices">
                         <td class="lead text-left">{{service.name}}</td>
-                        <td class="lead text-left"><a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                        <td class="lead text-left">
+                            <a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
                             <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
                         </td>
                         <td class="lead text-left">{{service.path}}</td>
