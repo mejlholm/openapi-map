@@ -69,13 +69,19 @@ public class ServiceScraper {
 
         List<PathResult> ingressResults = new ArrayList<>();
         for (Ingress i: ingresses) {
-            String serviceName = i.getMetadata().getName();
+            if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null && i.getMetadata().getAnnotations().containsKey("openapi-map/scrape")) {
+                if (i.getMetadata().getAnnotations().get("openapi-map/scrape").equalsIgnoreCase("false")){
+                    continue;
+                }
 
-            //todo, the edge case needs around rules need some more thought, can we only run into http?
-            IngressRule rule = i.getSpec().getRules().get(0);
-            final String openapiUrl = "http://" + rule.getHost() + "/openapi";
-            knownServices.put(serviceName, serviceName);
-            ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl));
+                String serviceName = i.getMetadata().getName();
+
+                //todo, the edge case needs around rules need some more thought, can we only run into http?
+                IngressRule rule = i.getSpec().getRules().get(0);
+                final String openapiUrl = "http://" + rule.getHost() + "/openapi";
+                knownServices.put(serviceName, serviceName);
+                ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl));
+            }
         }
 
         ingressedServices = ingressResults;
@@ -87,9 +93,15 @@ public class ServiceScraper {
                 .collect(Collectors.toList());
         List<PathResult> serviceResults = new ArrayList<>();
         for (Service s: services) {
-            String serviceName = s.getMetadata().getName();
-            final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
-            serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl)); //we won't provide links to url's that can't be reached.
+            if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null && s.getMetadata().getAnnotations().containsKey("openapi-map/scrape")) {
+                if (s.getMetadata().getAnnotations().get("openapi-map/scrape").equalsIgnoreCase("false")){
+                    continue;
+                }
+
+                String serviceName = s.getMetadata().getName();
+                final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
+                serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl)); //we won't provide links to url's that can't be reached.
+            }
         }
 
         nonIngressedServices = serviceResults;

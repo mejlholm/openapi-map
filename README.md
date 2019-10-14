@@ -23,3 +23,20 @@ kubectl apply -f deploy
 ~~~
 
 to automatically scrape the services in that namespace. 
+
+## Avoid scraping 
+
+To avoid scraping certain services/ingressses, add the following to your metadata:
+~~~Shell
+metadata:
+  annotations:
+    openapi-map/scrape: 'false'
+~~~
+
+
+
+
+## Known issues and future enhancements
+
+ - Better formatting of operations is needed 
+ - Add filters for labels
