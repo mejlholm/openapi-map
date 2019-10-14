@@ -23,11 +23,14 @@
                 <h1 class="display-4">OpenAPI Map</h1>
                 <p class="lead font-italic">Aggregated OpenAPI services in your cluster</p>
 
+                Filter service name: <input ng-model="filter.name" placeholder="Filter service name">
+                Filter path: <input ng-model="filter.path" placeholder="Filter path">
+
                 <br/>
                 <br/>
+
 
                 <h2 class="display-5" id="namespace">Namespace: {{namespace}}</h2>
-
                 <h3 class="display-5">Endpoints with ingresses</h3>
                 <table class="table">
                     <thead class="thead-dark">
@@ -39,7 +42,7 @@
                     </tr>
                     </thead>
                     <tbody id="ingressedServices">
-                    <tr ng-repeat="service in ingressedServices">
+                    <tr ng-repeat="service in ingressedServices | filter: filter">
                         <td class="lead text-left">{{service.name}}</td>
                         <td class="lead text-left">
                             <a ng-hide="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">OpenAPI</a>
@@ -64,7 +67,7 @@
                     </tr>
                     </thead>
                     <tbody id="nonIngressedServices">
-                    <tr ng-repeat="service in nonIngressedServices">
+                    <tr ng-repeat="service in nonIngressedServices | filter: filter">
                         <td class="lead text-left">{{service.name}}</td>
                         <td class="lead text-left">
                             <a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
