@@ -25,7 +25,7 @@ public class ServiceResource {
     ServiceScraper serviceCollector;
 
     @ConfigProperty(name = "NAMESPACE")
-    private String namespace;
+    String namespace;
 
     // TODO: 9/27/19 add feature to filter using labels from kubernetes
 

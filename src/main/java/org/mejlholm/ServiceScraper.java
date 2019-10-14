@@ -54,7 +54,7 @@ public class ServiceScraper {
     }
 
     @ConfigProperty(name = "NAMESPACE", defaultValue = "default")
-    private String namespace;
+    String namespace;
 
 
     @Scheduled(every = "10m")
