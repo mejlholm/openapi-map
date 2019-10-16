@@ -16,15 +16,18 @@
 </head>
 <body>
 
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Filters:</a>
+    <input ng-model="filter.name" placeholder="Filter service name" aria-label="Filter service name">
+    <input ng-model="filter.path" placeholder="Filter path" aria-label="Filter path">
+</nav>
+
 <div class="container h-100" ng-controller="OpenAPIMapController">
     <div class="row align-items-center h-100">
         <div class="col-12 mx-auto">
             <div style="background:transparent !important" class="jumbotron jumbotron-fluid text-center">
                 <h1 class="display-4">OpenAPI Map</h1>
                 <p class="lead font-italic">Aggregated OpenAPI services in your cluster</p>
-
-                Filter service name: <input ng-model="filter.name" placeholder="Filter service name">
-                Filter path: <input ng-model="filter.path" placeholder="Filter path">
 
                 <br/>
                 <br/>
