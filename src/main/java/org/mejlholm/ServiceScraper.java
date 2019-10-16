@@ -13,6 +13,7 @@ import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.PathItem;
 import org.eclipse.microprofile.openapi.models.Paths;
 import org.eclipse.microprofile.opentracing.Traced;
+import org.mejlholm.model.Annotation;
 import org.mejlholm.model.PathResult;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -56,6 +57,7 @@ public class ServiceScraper {
     @ConfigProperty(name = "NAMESPACE", defaultValue = "default")
     String namespace;
 
+    private final String scrapeAnnotation = "openapi-map/scrape";
 
     @Scheduled(every = "10m")
     void collectServices() {
@@ -69,18 +71,28 @@ public class ServiceScraper {
 
         List<PathResult> ingressResults = new ArrayList<>();
         for (Ingress i: ingresses) {
-            if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null && i.getMetadata().getAnnotations().containsKey("openapi-map/scrape")) {
-                if (i.getMetadata().getAnnotations().get("openapi-map/scrape").equalsIgnoreCase("false")){
+            if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null && i.getMetadata().getAnnotations().containsKey(scrapeAnnotation)) {
+                if (i.getMetadata().getAnnotations().get(scrapeAnnotation).equalsIgnoreCase("false")){
                     continue;
                 }
 
                 String serviceName = i.getMetadata().getName();
 
+                List<Annotation> scrapedAnnotations = new ArrayList<>();
+                if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null) {
+                    for (Map.Entry<String, String> entry: i.getMetadata().getAnnotations().entrySet()) {
+                        if (entry.getKey().contains("openapi-map")) {
+                            scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
+                        }
+                    }
+                }
+
+
                 //todo, the edge case needs around rules need some more thought, can we only run into http?
                 IngressRule rule = i.getSpec().getRules().get(0);
                 final String openapiUrl = "http://" + rule.getHost() + "/openapi";
                 knownServices.put(serviceName, serviceName);
-                ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl));
+                ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl, scrapedAnnotations));
             }
         }
 
@@ -93,14 +105,24 @@ public class ServiceScraper {
                 .collect(Collectors.toList());
         List<PathResult> serviceResults = new ArrayList<>();
         for (Service s: services) {
-            if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null && s.getMetadata().getAnnotations().containsKey("openapi-map/scrape")) {
-                if (s.getMetadata().getAnnotations().get("openapi-map/scrape").equalsIgnoreCase("false")){
+            if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null && s.getMetadata().getAnnotations().containsKey(scrapeAnnotation)) {
+                if (s.getMetadata().getAnnotations().get(scrapeAnnotation).equalsIgnoreCase("false")){
                     continue;
                 }
 
                 String serviceName = s.getMetadata().getName();
+
+                List<Annotation> scrapedAnnotations = new ArrayList<>();
+                if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null) {
+                    for (Map.Entry<String, String> entry: s.getMetadata().getAnnotations().entrySet()) {
+                        if (entry.getKey().contains("openapi-map")) {
+                            scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
+                        }
+                    }
+                }
+
                 final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
-                serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl)); //we won't provide links to url's that can't be reached.
+                serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl, scrapedAnnotations)); //we won't provide links to url's that can't be reached.
             }
         }
 
@@ -121,7 +143,7 @@ public class ServiceScraper {
         return null;
     }
 
-    private List<PathResult> parseOpenapi(String name, String openapiUiUrl, String openapiUrl, String baseUrl) {
+    private List<PathResult> parseOpenapi(String name, String openapiUiUrl, String openapiUrl, String baseUrl, List<Annotation> annotations) {
 
         List<PathResult> results = new ArrayList<>();
 
@@ -137,7 +159,7 @@ public class ServiceScraper {
         Paths paths = openAPI.getPaths();
 
         for (Map.Entry<String, PathItem> entry : paths.getPathItems().entrySet()) {
-            results.add(new PathResult(name, openapiUiUrl, openapiUrl, entry.getKey(), getPathOperations(entry.getValue())));
+            results.add(new PathResult(name, openapiUiUrl, openapiUrl, entry.getKey(), getPathOperations(entry.getValue()), annotations));
         }
         return results;
     }

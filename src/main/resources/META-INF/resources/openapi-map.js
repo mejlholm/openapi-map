@@ -1,5 +1,6 @@
 angular.module('openapiMapApp', [])
   .controller('OpenAPIMapController', function($scope, $http) {
+
     $http.get('/services/namespace')
         .then(function(response){
             $scope.namespace = response.data['namespace'];
