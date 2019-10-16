@@ -17,7 +17,7 @@ Built on [Quarkus.io](https://quarkus.io/) and a bit of angular,
 
 ## Getting started
 
-Adjust the namespace in the deploy/*.yaml files
+Adjust the namespace in deploy/deployment.yaml:
 ~~~Shell
 kubectl apply -f deploy
 ~~~
@@ -33,5 +33,3 @@ metadata:
     openapi-map/scrape: 'false'
 ~~~
 
-## Known issues and future enhancements
- - Add filters for labels
