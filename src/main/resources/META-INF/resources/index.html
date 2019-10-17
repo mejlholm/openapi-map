@@ -7,107 +7,104 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <style>
-        body,html {height: 100%;}
         .btn-group {display: flex;}
     </style>
 
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
     <script src="/openapi-map.js"></script>
 </head>
+
 <body>
 
 <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">OpenAPI Map - Aggregated OpenAPI services in your cluster</a>
     <a class="navbar-brand" href="#">Filters:</a>
     <input ng-model="filter.name" placeholder="Filter service name" aria-label="Filter service name">
     <input ng-model="filter.path" placeholder="Filter path" aria-label="Filter path">
-<!--
     <input ng-model="filter.annotations" placeholder="Filter annotation" aria-label="Filter annotation">
     <input ng-model="filter.operations" placeholder="Filter operation" aria-label="Filter operation">
--->
 </nav>
 
-<div class="container h-100" ng-controller="OpenAPIMapController">
-    <div class="row align-items-center h-100">
-        <div class="col-12 mx-auto">
-            <div style="background:transparent !important" class="jumbotron jumbotron-fluid text-center">
+<div class="container-fluid float-left" ng-controller="OpenAPIMapController">
 
-                <h1 class="display-4">OpenAPI Map</h1>
-                <p class="lead font-italic">Aggregated OpenAPI services in your cluster</p>
+    <div class="row" style="padding-top: 50px">
+        <h2 class="display-5">Namespace: {{namespace}}</h2>
+    </div>
 
-                <br/>
-                <br/>
+    <div class="row">
+        <h3 class="display-5">Endpoints with ingresses</h3>
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col" class="text-left">Service name</th>
+                <th scope="col" class="text-left">Links</th>
+                <th scope="col" class="text-left">Path</th>
+                <th scope="col" class="text-left">Operations</th>
+                <th scope="col" class="text-left">Annotations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="service in ingressedServices | filter: filter">
+                <td class="lead text-left">{{service.name}}</td>
+                <td class="lead text-left">
+                    <a ng-hide="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">OpenAPI</a>
+                    <a ng-hide="service.openapiUiUrl == null" target="_blank" href="{{service.openapiUiUrl}}">|
+                        UI</a>
+                </td>
+                <td class="lead text-left">{{service.path}}</td>
+                <td class="lead text-left text-nowrap">
+                    <button ng-repeat="operation in service.operations | filter: filter" type="button"
+                            class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>
+                        {{operation}}
+                    </button>
+                </td>
+                <td class="lead text-left">
+                    <div ng-hide="true"><a href="">Show annotations</a></div>
+                    <div ng-show="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}:
+                        {{annotation['value']}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
-                <h2 class="display-5" id="namespace">Namespace: {{namespace}}</h2>
-                <h3 class="display-5">Endpoints with ingresses</h3>
-                <table class="table">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col" class="text-left">Service name</th>
-                        <th scope="col" class="text-left">Links</th>
-                        <th scope="col" class="text-left">Path</th>
-                        <th scope="col" class="text-left">Operations</th>
-<!--
-                        <th scope="col" class="text-left">Annotations</th>
--->
-                    </tr>
-                    </thead>
-                    <tbody id="ingressedServices">
-                    <tr ng-repeat="service in ingressedServices | filter: filter">
-                        <td class="lead text-left">{{service.name}}</td>
-                        <td class="lead text-left">
-                            <a ng-hide="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">OpenAPI</a>
-                            <a ng-hide="service.openapiUiUrl == null" target="_blank" href="{{service.openapiUiUrl}}">| UI</a>
-                        </td>
-                        <td class="lead text-left">{{service.path}}</td>
-                        <td class="lead text-left text-nowrap">
-                            <button ng-repeat="operation in service.operations | filter: filter" type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}</button>
-                        </td>
-<!--
-                        <td class="lead text-left">
-                            <div ng-show="true"><a href="">Show annotations</a></div>
-                            <div ng-hide="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}: {{annotation['value']}}</div>
-                        </td>
--->
-                    </tr>
-                    </tbody>
-                </table>
+    <div class="row">
+        <h3 class="display-5">Endpoints without ingresses</h3>
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col" class="text-left">Service name</th>
+                <th scope="col" class="text-left">Links</th>
+                <th scope="col" class="text-left">Path</th>
+                <th scope="col" class="text-left">Operations</th>
+                <th scope="col" class="text-left">Annotations</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="service in nonIngressedServices | filter: filter">
+                <td class="lead text-left">{{service.name}}</td>
+                <td class="lead text-left">
+                    <a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
+                    <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
+                </td>
+                <td class="lead text-left">{{service.path}}</td>
+                <td class="lead text-left text-nowrap">
+                    <button ng-repeat="operation in service.operations | filter: filter" type="button"
+                            class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>
+                        {{operation}}
+                    </button>
+                </td>
+                <td class="lead text-left">
+                    <div ng-hide="true"><a href="">Show annotations</a></div>
+                    <div ng-show="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}:
+                        {{annotation['value']}}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-                <h3 class="display-5">Endpoints without ingresses</h3>
-                <table class="table">
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col" class="text-left">Service name</th>
-                        <th scope="col" class="text-left">Links</th>
-                        <th scope="col" class="text-left">Path</th>
-                        <th scope="col" class="text-left">Operations</th>
-<!--
-                        <th scope="col" class="text-left">Annotations</th>
--->
-                    </tr>
-                    </thead>
-                    <tbody id="nonIngressedServices">
-                    <tr ng-repeat="service in nonIngressedServices | filter: filter">
-                        <td class="lead text-left">{{service.name}}</td>
-                        <td class="lead text-left">
-                            <a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
-                            <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
-                        </td>
-                        <td class="lead text-left">{{service.path}}</td>
-                        <td class="lead text-left text-nowrap">
-                            <button ng-repeat="operation in service.operations | filter: filter" type="button" class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>{{operation}}</button>
-                        </td>
-                        <!--
-                        <td class="lead text-left">
-                            <div ng-show="true"><a href="">Show annotations</a></div>
-                            <div ng-hide="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}: {{annotation['value']}}</div>
-                        </td>
--->
-                    </tr>
-                    </tbody>
-                </table>
-
-            </div>
-        </div>
     </div>
 </div>
 

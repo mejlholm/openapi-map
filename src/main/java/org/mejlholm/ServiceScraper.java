@@ -81,7 +81,7 @@ public class ServiceScraper {
                 List<Annotation> scrapedAnnotations = new ArrayList<>();
                 if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null) {
                     for (Map.Entry<String, String> entry: i.getMetadata().getAnnotations().entrySet()) {
-                        if (entry.getKey().contains("openapi-map")) {
+                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains("openapi-map/scrape")) {
                             scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
                         }
                     }
@@ -115,7 +115,7 @@ public class ServiceScraper {
                 List<Annotation> scrapedAnnotations = new ArrayList<>();
                 if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null) {
                     for (Map.Entry<String, String> entry: s.getMetadata().getAnnotations().entrySet()) {
-                        if (entry.getKey().contains("openapi-map")) {
+                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains("openapi-map/scrape")) {
                             scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
                         }
                     }
