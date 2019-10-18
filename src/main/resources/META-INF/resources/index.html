@@ -55,13 +55,10 @@
                         </td>
                         <td class="lead text-left">{{service.path}}</td>
                         <td class="lead text-left text-nowrap">
-                            <div ng-repeat="method in service.methods | filter: methodsFilter">
-                                <button type="button" class="btn {{renderMethod(method)}} mr-1" aria-disabled="true" disabled>{{method}}</button>
-                            </div>
+                            <button ng-repeat="method in service.methods | filter: methodsFilter" type="button" class="btn {{renderMethod(method)}} mr-1" aria-disabled="true" disabled>{{method}}</button>
                         </td>
                         <td class="lead text-left">
-                            <div ng-hide="true"><a href="">Show annotations</a></div>
-                            <div ng-show="true" ng-repeat="annotation in service.annotations| filter: annotationsFilter">{{annotation['name']}}: {{annotation['value']}}</div>
+                            <div ng-repeat="annotation in service.annotations| filter: annotationsFilter">{{annotation['name']}}: {{annotation['value']}}</div>
                         </td>
                     </tr>
                 </tbody>
