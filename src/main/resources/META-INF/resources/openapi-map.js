@@ -8,15 +8,10 @@ angular.module('openapiMapApp', [])
             $scope.namespace = "ERROR";
         });
 
-    $http.get('/services/ingressed')
+    $http.get('/services')
         .then(function(response){
             console.log(response.data);
             $scope.ingressedServices = response.data;
-        });
-
-    $http.get('/services/nonIngressed')
-        .then(function(response){
-            $scope.nonIngressedServices = response.data;
         });
 
     $scope.renderOperation = function(operation) {

@@ -25,86 +25,51 @@
     <input ng-model="filter.operations" placeholder="Filter operation" aria-label="Filter operation">
 </nav>
 
-<div class="container-fluid float-left" ng-controller="OpenAPIMapController">
+<div class="container-fluid" ng-controller="OpenAPIMapController">
 
     <div class="row" style="padding-top: 50px">
-        <h2 class="display-5">Namespace: {{namespace}}</h2>
-    </div>
 
-    <div class="row">
-        <h3 class="display-5">Endpoints with ingresses</h3>
-        <table class="table">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col" class="text-left">Service name</th>
-                <th scope="col" class="text-left">Links</th>
-                <th scope="col" class="text-left">Path</th>
-                <th scope="col" class="text-left">Operations</th>
-                <th scope="col" class="text-left">Annotations</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="service in ingressedServices | filter: filter">
-                <td class="lead text-left">{{service.name}}</td>
-                <td class="lead text-left">
-                    <a ng-hide="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">OpenAPI</a>
-                    <a ng-hide="service.openapiUiUrl == null" target="_blank" href="{{service.openapiUiUrl}}">|
-                        UI</a>
-                </td>
-                <td class="lead text-left">{{service.path}}</td>
-                <td class="lead text-left text-nowrap">
-                    <button ng-repeat="operation in service.operations | filter: filter" type="button"
-                            class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>
-                        {{operation}}
-                    </button>
-                </td>
-                <td class="lead text-left">
-                    <div ng-hide="true"><a href="">Show annotations</a></div>
-                    <div ng-show="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}:
-                        {{annotation['value']}}
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+        <div class="col"></div>
 
-    <div class="row">
-        <h3 class="display-5">Endpoints without ingresses</h3>
-        <table class="table">
-            <thead class="thead-dark">
-            <tr>
-                <th scope="col" class="text-left">Service name</th>
-                <th scope="col" class="text-left">Links</th>
-                <th scope="col" class="text-left">Path</th>
-                <th scope="col" class="text-left">Operations</th>
-                <th scope="col" class="text-left">Annotations</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="service in nonIngressedServices | filter: filter">
-                <td class="lead text-left">{{service.name}}</td>
-                <td class="lead text-left">
-                    <a ng-hide="service.openapiUrl == null" href="{{service.openapiUrl}}">OpenAPI</a>
-                    <a ng-hide="service.openapiUiUrl == null" href="{{service.openapiUiUrl}}">| UI</a>
-                </td>
-                <td class="lead text-left">{{service.path}}</td>
-                <td class="lead text-left text-nowrap">
-                    <button ng-repeat="operation in service.operations | filter: filter" type="button"
-                            class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>
-                        {{operation}}
-                    </button>
-                </td>
-                <td class="lead text-left">
-                    <div ng-hide="true"><a href="">Show annotations</a></div>
-                    <div ng-show="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}:
-                        {{annotation['value']}}
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="col-10">
+            <h2 class="display-5">Namespace: {{namespace}}</h2>
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col" class="text-left">Service</th>
+                    <th scope="col" class="text-left">Links</th>
+                    <th scope="col" class="text-left">Path</th>
+                    <th scope="col" class="text-left">Operations</th>
+                    <th scope="col" class="text-left">Annotations</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="service in ingressedServices | filter: filter">
+                    <td class="lead text-left">
+                        <a ng-hide="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">{{service.name}}</a>
+                    </td>
+                    <td class="lead text-left">
+                        <a ng-hide="service.openapiUiUrl == null" target="_blank" href="{{service.openapiUiUrl}}">UI</a>
+                    </td>
+                    <td class="lead text-left">{{service.path}}</td>
+                    <td class="lead text-left text-nowrap">
+                        <button ng-repeat="operation in service.operations | filter: filter" type="button"
+                                class="btn {{renderOperation(operation)}} mr-1" aria-disabled="true" disabled>
+                            {{operation}}
+                        </button>
+                    </td>
+                    <td class="lead text-left">
+                        <div ng-hide="true"><a href="">Show annotations</a></div>
+                        <div ng-show="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}:
+                            {{annotation['value']}}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
+        <div class="col"></div>
     </div>
 </div>
 

@@ -22,24 +22,15 @@ import javax.ws.rs.core.Response;
 public class ServiceResource {
 
     @Inject
-    ServiceScraper serviceCollector;
+    ServiceScraper serviceScraper;
 
-    @ConfigProperty(name = "NAMESPACE")
+    @ConfigProperty(name = "NAMESPACE", defaultValue = "default")
     String namespace;
 
-    // TODO: 9/27/19 add feature to filter using labels from kubernetes
-
-
     @GET
-    @Path("ingressed")
-    public Response getIngressedServices() {
-        return Response.ok().entity(serviceCollector.getIngressedServices()).build();
-    }
-
-    @GET
-    @Path("nonIngressed")
-    public Response getNonIngressedServices() {
-        return Response.ok().entity(serviceCollector.getNonIngressedServices()).build();
+    @Path("")
+    public Response getServices() {
+        return Response.ok().entity(serviceScraper.getServices()).build();
     }
 
     @GET

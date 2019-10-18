@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -41,38 +43,38 @@ public class ServiceScraper {
         this.kubernetesClient = kubernetesClient;
     }
 
-    private Map<String, String> knownServices = new HashMap<>();
-    private List<PathResult> ingressedServices = new ArrayList<>();
-    private List<PathResult> nonIngressedServices = new ArrayList<>();
-
-
-    List<PathResult> getIngressedServices() {
-        return ingressedServices;
-    }
-
-    List<PathResult> getNonIngressedServices() {
-        return nonIngressedServices;
-    }
+    private List<PathResult> services = new ArrayList<>();
 
     @ConfigProperty(name = "NAMESPACE", defaultValue = "default")
     String namespace;
 
-    private final String scrapeAnnotation = "openapi-map/scrape";
+    private static final String SCRAPE_ANNOTATION = "openapi-map/scrape";
 
     @Scheduled(every = "10m")
-    void collectServices() {
+    void scrape() {
 
+        Set<String> knownServices = new HashSet<>();
+
+        services = scrapeIngressedServices(knownServices);
+        services.addAll(scrapeServices(knownServices));
+
+        services.sort(Comparator.comparing(PathResult::getName));
+    }
+
+    private List<PathResult> scrapeIngressedServices(Set knownServices) {
+        /* setup client */
         ClientBuilder clientBuilder = ClientBuilder.newBuilder();
         clientBuilder.connectTimeout(1, TimeUnit.SECONDS);
         clientBuilder.readTimeout(1, TimeUnit.SECONDS);
         Client client = clientBuilder.build();
 
-        List<Ingress> ingresses = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
+        List<Ingress> ingressItems = kubernetesClient.extensions().ingresses().inNamespace(namespace).list().getItems();
 
+        /* use ingressed services before plain services, as they are accessible from the outside */
         List<PathResult> ingressResults = new ArrayList<>();
-        for (Ingress i: ingresses) {
-            if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null && i.getMetadata().getAnnotations().containsKey(scrapeAnnotation)) {
-                if (i.getMetadata().getAnnotations().get(scrapeAnnotation).equalsIgnoreCase("false")){
+        for (Ingress i: ingressItems) {
+            if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null && i.getMetadata().getAnnotations().containsKey(SCRAPE_ANNOTATION)) {
+                if (i.getMetadata().getAnnotations().get(SCRAPE_ANNOTATION).equalsIgnoreCase("false")){
                     continue;
                 }
 
@@ -81,7 +83,7 @@ public class ServiceScraper {
                 List<Annotation> scrapedAnnotations = new ArrayList<>();
                 if (i.getMetadata() != null && i.getMetadata().getAnnotations() != null) {
                     for (Map.Entry<String, String> entry: i.getMetadata().getAnnotations().entrySet()) {
-                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains("openapi-map/scrape")) {
+                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains(SCRAPE_ANNOTATION)) {
                             scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
                         }
                     }
@@ -91,22 +93,24 @@ public class ServiceScraper {
                 //todo, the edge case needs around rules need some more thought, can we only run into http?
                 IngressRule rule = i.getSpec().getRules().get(0);
                 final String openapiUrl = "http://" + rule.getHost() + "/openapi";
-                knownServices.put(serviceName, serviceName);
+                knownServices.add(serviceName);
                 ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl, scrapedAnnotations));
             }
         }
 
-        ingressedServices = ingressResults;
+        client.close();
 
+        return ingressResults;
+    }
 
-
-        List<Service> services = kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
-                .filter(s -> !knownServices.containsKey(s.getMetadata().getName()))
+    private List<PathResult> scrapeServices(Set knownServices) {
+        List<Service> serviceItems = kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
+                .filter(s -> !knownServices.contains(s.getMetadata().getName()))
                 .collect(Collectors.toList());
         List<PathResult> serviceResults = new ArrayList<>();
-        for (Service s: services) {
-            if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null && s.getMetadata().getAnnotations().containsKey(scrapeAnnotation)) {
-                if (s.getMetadata().getAnnotations().get(scrapeAnnotation).equalsIgnoreCase("false")){
+        for (Service s: serviceItems) {
+            if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null && s.getMetadata().getAnnotations().containsKey(SCRAPE_ANNOTATION)) {
+                if (s.getMetadata().getAnnotations().get(SCRAPE_ANNOTATION).equalsIgnoreCase("false")){
                     continue;
                 }
 
@@ -115,7 +119,7 @@ public class ServiceScraper {
                 List<Annotation> scrapedAnnotations = new ArrayList<>();
                 if (s.getMetadata() != null && s.getMetadata().getAnnotations() != null) {
                     for (Map.Entry<String, String> entry: s.getMetadata().getAnnotations().entrySet()) {
-                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains("openapi-map/scrape")) {
+                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains(SCRAPE_ANNOTATION)) {
                             scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
                         }
                     }
@@ -126,13 +130,11 @@ public class ServiceScraper {
             }
         }
 
-        nonIngressedServices = serviceResults;
-
-        client.close();
+        return serviceResults;
     }
 
     private String getOpenapiUiUrl(Client client, String host) {
-        String[] possibleUiPaths = {"/openapi/ui/", "/swagger-ui/"}; //other???
+        String[] possibleUiPaths = {"/swagger-ui/", "/openapi/ui/"}; //other???
         for (String path: possibleUiPaths) {
             String fullPath = "http://" + host + path;
             Response response = client.target(fullPath).request().get();
@@ -194,6 +196,10 @@ public class ServiceScraper {
         }
 
         return operations;
+    }
+
+    List<PathResult> getServices() {
+        return services;
     }
 
 }
