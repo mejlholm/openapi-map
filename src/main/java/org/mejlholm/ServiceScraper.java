@@ -161,41 +161,41 @@ public class ServiceScraper {
         Paths paths = openAPI.getPaths();
 
         for (Map.Entry<String, PathItem> entry : paths.getPathItems().entrySet()) {
-            results.add(new PathResult(name, openapiUiUrl, openapiUrl, entry.getKey(), getPathOperations(entry.getValue()), annotations));
+            results.add(new PathResult(name, openapiUiUrl, openapiUrl, entry.getKey(), getPathMethods(entry.getValue()), annotations));
         }
         return results;
     }
 
 
-    private List<String> getPathOperations(PathItem pathItem) {
-        List<String> operations = new ArrayList<>();
+    private List<String> getPathMethods(PathItem pathItem) {
+        List<String> methods = new ArrayList<>();
 
         if (pathItem.getDELETE() != null) {
-            operations.add("DELETE");
+            methods.add("DELETE");
         }
         if (pathItem.getGET() != null) {
-            operations.add("GET");
+            methods.add("GET");
         }
         if (pathItem.getHEAD() != null) {
-            operations.add("HEAD");
+            methods.add("HEAD");
         }
         if (pathItem.getOPTIONS() != null) {
-            operations.add("OPTIONS");
+            methods.add("OPTIONS");
         }
         if (pathItem.getPATCH() != null) {
-            operations.add("PATCH");
+            methods.add("PATCH");
         }
         if (pathItem.getPOST() != null) {
-            operations.add("POST");
+            methods.add("POST");
         }
         if (pathItem.getPUT() != null) {
-            operations.add("PUT");
+            methods.add("PUT");
         }
         if (pathItem.getTRACE() != null) {
-            operations.add("TRACE");
+            methods.add("TRACE");
         }
 
-        return operations;
+        return methods;
     }
 
     List<PathResult> getServices() {

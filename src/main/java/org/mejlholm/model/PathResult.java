@@ -13,7 +13,7 @@ public class PathResult {
     private final String openapiUrl;
     private final String openapiUiUrl;
     private final String path;
-    private final List<String> operations;
+    private final List<String> methods;
     private final List<Annotation> annotations;
 
 }

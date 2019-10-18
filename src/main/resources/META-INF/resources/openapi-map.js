@@ -10,20 +10,19 @@ angular.module('openapiMapApp', [])
 
     $http.get('/services')
         .then(function(response){
-            console.log(response.data);
-            $scope.ingressedServices = response.data;
+            $scope.services = response.data;
         });
 
-    $scope.renderOperation = function(operation) {
-        var className = "btn-secondary"; //default color for the more exotic operations
+    $scope.renderMethod = function(method) {
+        var className = "btn-secondary"; //default color for the more exotic methods
 
-        if (operation === 'GET'){
+        if (method === 'GET'){
             className = "btn-primary";
-        } else if (operation === 'DELETE') {
+        } else if (method === 'DELETE') {
             className = 'btn-danger';
-        } else if (operation === 'POST') {
+        } else if (method === 'POST') {
             className = 'btn-success';
-        } else if (operation === 'PUT') {
+        } else if (method === 'PUT') {
             className = 'btn-warning';
         }
         return className;
