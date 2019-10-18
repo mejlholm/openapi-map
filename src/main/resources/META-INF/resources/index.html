@@ -21,8 +21,8 @@
     <span class="navbar-text">Filters:</span>
     <input ng-model="filter.name" placeholder="Filter service name" aria-label="Filter service name">
     <input ng-model="filter.path" placeholder="Filter path" aria-label="Filter path">
-    <input ng-model="filter.annotations" placeholder="Filter annotation" aria-label="Filter annotation">
-    <input ng-model="filter.methods" placeholder="Filter methods" aria-label="Filter methods">
+    <input ng-model="annotationsFilter" placeholder="Filter annotation" aria-label="Filter annotation">
+    <input ng-model="methodsFilter" placeholder="Filter methods" aria-label="Filter methods">
 </nav>
 
 <div class="container-fluid" ng-controller="OpenAPIMapController">
@@ -55,13 +55,13 @@
                         </td>
                         <td class="lead text-left">{{service.path}}</td>
                         <td class="lead text-left text-nowrap">
-                            <div ng-repeat="method in service.methods">
+                            <div ng-repeat="method in service.methods | filter: methodsFilter">
                                 <button type="button" class="btn {{renderMethod(method)}} mr-1" aria-disabled="true" disabled>{{method}}</button>
                             </div>
                         </td>
                         <td class="lead text-left">
                             <div ng-hide="true"><a href="">Show annotations</a></div>
-                            <div ng-show="true" ng-repeat="annotation in service.annotations">{{annotation['name']}}: {{annotation['value']}}</div>
+                            <div ng-show="true" ng-repeat="annotation in service.annotations| filter: annotationsFilter">{{annotation['name']}}: {{annotation['value']}}</div>
                         </td>
                     </tr>
                 </tbody>
