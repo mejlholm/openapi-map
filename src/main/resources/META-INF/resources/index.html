@@ -21,8 +21,8 @@
     <span class="navbar-text">Filters:</span>
     <input ng-model="filter.name" placeholder="Filter service name" aria-label="Filter service name">
     <input ng-model="filter.path" placeholder="Filter path" aria-label="Filter path">
-    <input ng-model="annotationsFilter" placeholder="Filter annotation" aria-label="Filter annotation">
     <input ng-model="methodsFilter" placeholder="Filter methods" aria-label="Filter methods">
+    <input ng-model="annotationsFilter" placeholder="Filter annotation" aria-label="Filter annotation">
 </nav>
 
 <div class="container-fluid" ng-controller="OpenAPIMapController">
@@ -45,7 +45,7 @@
                 </thead>
 
                 <tbody>
-                    <tr ng-repeat="service in services | filter: filter">
+                    <tr ng-repeat="service in services | filter: filter | filter: methodsFilter | filter: annotationsFilter">
                         <td class="lead text-left">
                             <a ng-hide="service.openapiUrl == null" target="_blank" href="{{service.openapiUrl}}">{{service.name}}</a>
                             <div ng-show="service.openapiUrl == null">{{service.name}}</div>
@@ -55,10 +55,10 @@
                         </td>
                         <td class="lead text-left">{{service.path}}</td>
                         <td class="lead text-left text-nowrap">
-                            <button ng-repeat="method in service.methods | filter: methodsFilter" type="button" class="btn {{renderMethod(method)}} mr-1" aria-disabled="true" disabled>{{method}}</button>
+                            <button ng-repeat="method in service.methods" type="button" class="btn {{renderMethod(method)}} mr-1" aria-disabled="true" disabled>{{method}}</button>
                         </td>
                         <td class="lead text-left">
-                            <div ng-repeat="annotation in service.annotations| filter: annotationsFilter">{{annotation['name']}}: {{annotation['value']}}</div>
+                            <div ng-repeat="annotation in service.annotations>{{annotation['name']}}: {{annotation['value']}}</div>
                         </td>
                     </tr>
                 </tbody>
