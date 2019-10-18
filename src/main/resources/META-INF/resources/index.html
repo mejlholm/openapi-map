@@ -58,7 +58,7 @@
                             <button ng-repeat="method in service.methods" type="button" class="btn {{renderMethod(method)}} mr-1" aria-disabled="true" disabled>{{method}}</button>
                         </td>
                         <td class="lead text-left">
-                            <div ng-repeat="annotation in service.annotations>{{annotation['name']}}: {{annotation['value']}}</div>
+                            <div ng-repeat="annotation in service.annotations">{{annotation['name']}}: {{annotation['value']}}</div>
                         </td>
                     </tr>
                 </tbody>
