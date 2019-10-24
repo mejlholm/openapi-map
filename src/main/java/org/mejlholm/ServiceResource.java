@@ -34,6 +34,13 @@ public class ServiceResource {
     }
 
     @GET
+    @Path("scrape")
+    public Response scrape() {
+        serviceScraper.scrape();
+        return Response.ok().build();
+    }
+
+    @GET
     @Path("namespace")
     public Response getNamespace() {
         JsonObject payload = Json.createObjectBuilder()
