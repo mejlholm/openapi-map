@@ -1,5 +1,6 @@
 package org.mejlholm;
 
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.fabric8.kubernetes.api.model.extensions.IngressRule;
@@ -74,21 +75,7 @@ public class ServiceScraper {
         List<PathResult> ingressResults = new ArrayList<>();
         for (Ingress i : ingressItems) {
             if (i.getMetadata() != null) {
-
-                List<Annotation> scrapedAnnotations = new ArrayList<>();
-                if (i.getMetadata().getAnnotations() != null) {
-                    if (i.getMetadata().getAnnotations().containsKey(SCRAPE_ANNOTATION) && i.getMetadata().getAnnotations().get(SCRAPE_ANNOTATION).equalsIgnoreCase("false")) {
-                        continue;
-                    }
-
-                    if (i.getMetadata().getAnnotations() != null) {
-                        for (Map.Entry<String, String> entry : i.getMetadata().getAnnotations().entrySet()) {
-                            if (entry.getKey().contains("openapi-map") && !entry.getKey().contains(SCRAPE_ANNOTATION)) {
-                                scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
-                            }
-                        }
-                    }
-                }
+                List<Annotation> scrapedAnnotations = findAnnotations(i.getMetadata());
 
                 //todo, the edge case needs around rules need some more thought, can we only run into http?
                 String serviceName = i.getMetadata().getName();
@@ -112,20 +99,7 @@ public class ServiceScraper {
         for (Service s : serviceItems) {
             if (s.getMetadata() != null) {
 
-                List<Annotation> scrapedAnnotations = new ArrayList<>();
-                if (s.getMetadata().getAnnotations() != null) {
-                    if (s.getMetadata().getAnnotations().containsKey(SCRAPE_ANNOTATION) && s.getMetadata().getAnnotations().get(SCRAPE_ANNOTATION).equalsIgnoreCase("false")) {
-                        continue;
-                    }
-                }
-
-                if (s.getMetadata().getAnnotations() != null) {
-                    for (Map.Entry<String, String> entry : s.getMetadata().getAnnotations().entrySet()) {
-                        if (entry.getKey().contains("openapi-map") && !entry.getKey().contains(SCRAPE_ANNOTATION)) {
-                            scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
-                        }
-                    }
-                }
+                List<Annotation> scrapedAnnotations = findAnnotations(s.getMetadata());
 
                 String serviceName = s.getMetadata().getName();
                 final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
@@ -135,9 +109,27 @@ public class ServiceScraper {
         return serviceResults;
     }
 
+    private List<Annotation> findAnnotations(ObjectMeta meta) {
+        List<Annotation> scrapedAnnotations = new ArrayList<>();
+        if (meta.getAnnotations() != null) {
+            Map<String, String> annotations = meta.getAnnotations();
+            if (annotations.containsKey(SCRAPE_ANNOTATION) && annotations.get(SCRAPE_ANNOTATION).equalsIgnoreCase("false")) {
+                return scrapedAnnotations;
+            }
+
+            for (Map.Entry<String, String> entry : annotations.entrySet()) {
+                if (entry.getKey().contains("openapi-map") && !entry.getKey().contains(SCRAPE_ANNOTATION)) {
+                    scrapedAnnotations.add(new Annotation(entry.getKey(), entry.getValue()));
+                }
+            }
+        }
+
+        return scrapedAnnotations;
+    }
+
     private String getOpenapiUiUrl(Client client, String host) {
         String[] possibleUiPaths = {"/swagger-ui/", "/openapi/ui/"}; //other???
-        for (String path: possibleUiPaths) {
+        for (String path : possibleUiPaths) {
             String fullPath = "http://" + host + path;
             Response response = client.target(fullPath).request().get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
