@@ -60,8 +60,6 @@ public class ServiceScraper {
         services.addAll(scrapeServices(knownServices));
 
         services.sort(Comparator.comparing(PathResult::getName));
-
-        log.info(services.toString());
     }
 
     private List<PathResult> scrapeIngressedServices(Set<String> knownServices) {
