@@ -102,7 +102,7 @@ public class ServiceScraper {
                 List<Annotation> scrapedAnnotations = findAnnotations(s.getMetadata());
 
                 String serviceName = s.getMetadata().getName();
-                final String openapiUrl = "http://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
+                final String openapiUrl = "https://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
                 serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl, scrapedAnnotations)); //we won't provide links to url's that can't be reached.
             }
         }
