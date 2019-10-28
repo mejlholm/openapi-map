@@ -153,6 +153,10 @@ public class ServiceScraper {
         }
 
         Paths paths = openAPI.getPaths();
+        if (paths == null) {
+            log.info("No paths for service: " + name);
+            return results;
+        }
 
         for (Map.Entry<String, PathItem> entry : paths.getPathItems().entrySet()) {
             results.add(new PathResult(name, openapiUiUrl, openapiUrl, entry.getKey(), getPathMethods(entry.getValue()), annotations));
