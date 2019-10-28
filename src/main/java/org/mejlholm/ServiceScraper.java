@@ -60,9 +60,11 @@ public class ServiceScraper {
         services.addAll(scrapeServices(knownServices));
 
         services.sort(Comparator.comparing(PathResult::getName));
+
+        log.info(services.toString());
     }
 
-    private List<PathResult> scrapeIngressedServices(Set knownServices) {
+    private List<PathResult> scrapeIngressedServices(Set<String> knownServices) {
         /* setup client */
         ClientBuilder clientBuilder = ClientBuilder.newBuilder();
         clientBuilder.connectTimeout(1, TimeUnit.SECONDS);
@@ -75,14 +77,14 @@ public class ServiceScraper {
         List<PathResult> ingressResults = new ArrayList<>();
         for (Ingress i : ingressItems) {
             if (i.getMetadata() != null) {
-                List<Annotation> scrapedAnnotations = findAnnotations(i.getMetadata());
 
                 //todo, the edge case needs around rules need some more thought, can we only run into http?
                 String serviceName = i.getMetadata().getName();
                 IngressRule rule = i.getSpec().getRules().get(0);
                 final String openapiUrl = "http://" + rule.getHost() + "/openapi";
                 knownServices.add(serviceName);
-                ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl, scrapedAnnotations));
+
+                ingressResults.addAll(parseOpenapi(serviceName, openapiUrl, getOpenapiUiUrl(client, rule.getHost()), openapiUrl, findAnnotations(i.getMetadata())));
             }
         }
 
@@ -91,19 +93,19 @@ public class ServiceScraper {
         return ingressResults;
     }
 
-    private List<PathResult> scrapeServices(Set knownServices) {
+    private List<PathResult> scrapeServices(Set<String> knownServices) {
+
         List<Service> serviceItems = kubernetesClient.services().inNamespace(namespace).list().getItems().stream()
                 .filter(s -> !knownServices.contains(s.getMetadata().getName()))
                 .collect(Collectors.toList());
+
         List<PathResult> serviceResults = new ArrayList<>();
         for (Service s : serviceItems) {
             if (s.getMetadata() != null) {
 
-                List<Annotation> scrapedAnnotations = findAnnotations(s.getMetadata());
-
-                String serviceName = s.getMetadata().getName();
                 final String openapiUrl = "https://" + s.getSpec().getClusterIP() + ":" + s.getSpec().getPorts().get(0).getPort() + "/openapi";
-                serviceResults.addAll(parseOpenapi(serviceName, null, null, openapiUrl, scrapedAnnotations)); //we won't provide links to url's that can't be reached.
+
+                serviceResults.addAll(parseOpenapi(s.getMetadata().getName(), null, null, openapiUrl, findAnnotations(s.getMetadata()))); //we won't provide links to url's that can't be reached.
             }
         }
         return serviceResults;
