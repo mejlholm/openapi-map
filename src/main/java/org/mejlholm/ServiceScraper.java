@@ -128,7 +128,7 @@ public class ServiceScraper {
     }
 
     private String getOpenapiUiUrl(Client client, String host) {
-        String[] possibleUiPaths = {"/swagger-ui/", "/openapi/ui/"}; //other???
+        String[] possibleUiPaths = {"/openapi/ui/", "/swagger-ui/"}; //other???
         for (String path : possibleUiPaths) {
             String fullPath = "http://" + host + path;
             Response response = client.target(fullPath).request().get();
