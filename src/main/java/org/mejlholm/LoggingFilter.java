@@ -42,7 +42,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
             tracer.activeSpan().setBaggageItem("uuid", uuid);
         }
 
-        log.info("Request [UUID=" + uuid +"] " + method + " " + path + " from IP " + address);
+        log.info("Request [CID=" + uuid +"] " + method + " " + path + " from IP " + address);
 
         tracer.activeSpan().setTag("uuid", uuid).setTag("method", method).setTag("path", path).setTag("address", address);
     }
@@ -50,7 +50,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         if (responseContext != null && tracer.activeSpan() != null && tracer.activeSpan().getBaggageItem("uuid") != null) {
-            log.info("Response [UUID=" + tracer.activeSpan().getBaggageItem("uuid") + "] status code " + responseContext.getStatus());
+            log.info("Response [CID=" + tracer.activeSpan().getBaggageItem("uuid") + "] status code " + responseContext.getStatus());
         } else {
             log.info("No response context");
         }

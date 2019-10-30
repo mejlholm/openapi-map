@@ -26,7 +26,7 @@ to automatically scrape the services in that namespace.
 
 ## Avoid scraping 
 
-To avoid scraping certain services/ingressses, add the following to your metadata:
+To avoid scraping certain services/ingresses, add the following to your metadata:
 ~~~Shell
 metadata:
   annotations:
