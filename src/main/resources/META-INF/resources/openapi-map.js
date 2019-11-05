@@ -4,7 +4,7 @@ angular.module('openapiMapApp', [])
     $http.get('/services/namespace')
         .then(function(response){
             $scope.namespace = response.data['namespace'];
-        }, function(response){
+        }, function(){
             $scope.namespace = "ERROR";
         });
 
