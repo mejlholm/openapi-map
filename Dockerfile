@@ -1,25 +1,15 @@
-FROM maven:3.6.2-jdk-11-slim AS build
-
-COPY pom.xml pom.xml
-
-#download dependencies for caching
-RUN mvn -B org.apache.maven.plugins:maven-dependency-plugin:3.1.1:go-offline
-
-#copy the rest and build it
-COPY src src
-RUN mvn verify -Dmaven.test.skip=true
-
+FROM quay.io/quarkus/centos-quarkus-maven:19.2.1 AS build
+COPY src /usr/src/app/src
+COPY pom.xml /usr/src/app
+USER root
+RUN chown -R quarkus /usr/src/app
+USER quarkus
+RUN mvn -f /usr/src/app/pom.xml -Pnative clean package
 
 #base image for deployment
-FROM gcr.io/distroless/java:11
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+WORKDIR /work/
+COPY --from=build /usr/src/app/target/*-runner /work/application
+RUN chmod 775 /work
 EXPOSE 8080
-
-#copy build results
-ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
-ENV AB_ENABLED=jmx_exporter
-COPY --from=build target/lib/* /deployments/lib/
-COPY --from=build target/*-runner.jar /deployments/app.jar
-
-#set application start
-WORKDIR /deployments
-CMD ["app.jar"]
+CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
