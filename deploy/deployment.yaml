@@ -23,7 +23,7 @@ spec:
       serviceAccountName: openapi-map
       containers:
       - name: openapi-map
-        image: mejlholm/openapi-map:0.0.80
+        image: mejlholm/openapi-map:0.0.91
         resources:
           limits:
             memory: "256Mi"
