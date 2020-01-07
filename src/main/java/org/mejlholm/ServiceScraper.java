@@ -148,13 +148,13 @@ public class ServiceScraper {
             InputStream input = new URL(baseUrl).openStream();
             openAPI = OpenApiParser.parse(input, OpenApiSerializer.Format.YAML);
         } catch (IOException e) {
-            log.info("Unable to open url: " + baseUrl);
+            log.debug("Unable to open url: " + baseUrl);
             return results;
         }
 
         Paths paths = openAPI.getPaths();
         if (paths == null) {
-            log.info("No paths for service: " + name);
+            log.debug("No paths for service: " + name);
             return results;
         }
 

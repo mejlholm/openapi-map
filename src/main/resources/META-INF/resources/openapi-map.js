@@ -14,7 +14,7 @@ angular.module('openapiMapApp', [])
         });
 
     $scope.renderMethod = function(method) {
-        var className = "btn-secondary"; //default color for the more exotic methods
+        let className = "btn-secondary"; //default color for the more exotic methods
 
         if (method === 'GET'){
             className = "btn-primary";
