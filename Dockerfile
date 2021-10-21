@@ -1,8 +1,7 @@
-FROM maven:3.6.3-jdk-11-slim AS build
-
-COPY pom.xml pom.xml
+FROM maven:3.8.3-openjdk-17-slim AS build
 
 #download dependencies for caching
+COPY pom.xml pom.xml
 RUN mvn -B org.apache.maven.plugins:maven-dependency-plugin:3.1.1:go-offline
 
 #copy the rest and build it
@@ -11,7 +10,7 @@ RUN mvn verify -Dmaven.test.skip=true
 
 
 #base image for deployment
-FROM gcr.io/distroless/java:11
+FROM openjdk:17-alpine3.14
 EXPOSE 8080
 
 #copy build results
