@@ -17,8 +17,8 @@ EXPOSE 8080
 #copy build results
 ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 ENV AB_ENABLED=jmx_exporter
-COPY --from=build target/lib/* /deployments/lib/
-COPY --from=build target/*-runner.jar /deployments/app.jar
+COPY --from=build target/quarkus-app/lib/* /deployments/lib/
+COPY --from=build target/quarkus-app/app/openapi-map-1.0-SNAPSHOT.jar /deployments/app.jar
 
 #set application start
 WORKDIR /deployments
