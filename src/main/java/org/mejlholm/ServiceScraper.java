@@ -6,8 +6,8 @@ import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.fabric8.kubernetes.api.model.extensions.IngressRule;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkus.scheduler.Scheduled;
+import io.smallrye.openapi.runtime.io.Format;
 import io.smallrye.openapi.runtime.io.OpenApiParser;
-import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
@@ -146,7 +146,7 @@ public class ServiceScraper {
         OpenAPI openAPI;
         try {
             InputStream input = new URL(baseUrl).openStream();
-            openAPI = OpenApiParser.parse(input, OpenApiSerializer.Format.YAML);
+            openAPI = OpenApiParser.parse(input, Format.YAML);
         } catch (IOException e) {
             log.debug("Unable to open url: " + baseUrl);
             return results;
